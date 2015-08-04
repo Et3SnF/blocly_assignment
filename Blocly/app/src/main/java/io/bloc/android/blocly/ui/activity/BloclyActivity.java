@@ -47,6 +47,8 @@ public class BloclyActivity extends ActionBarActivity implements
     private Menu menu;
     private View overflowButton;
 
+    private RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +65,7 @@ public class BloclyActivity extends ActionBarActivity implements
 
         // Display the recyclerView, which contains the adapter, layout manager, and animator
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
+        recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
         // #12
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -296,9 +298,21 @@ public class BloclyActivity extends ActionBarActivity implements
         int positionToExpand = -1;
         int positionToContract = -1;
 
+        // If view is already opened, contract it
+
         if (itemAdapter.getExpandedItem() != null) {
             positionToContract = BloclyApplication.getSharedDataSource().getItems().indexOf(itemAdapter.getExpandedItem());
+
+            View viewToContract = recyclerView.getLayoutManager().findViewByPosition(positionToContract);
+
+            if(viewToContract == null) {
+                positionToContract = -1;
+            }
+
         }
+
+        // If view is selected, recover the position. Then set the expanded item.
+        // When the user clicks on the expanded item, contract it. (null)
 
         if (itemAdapter.getExpandedItem() != rssItem) {
             positionToExpand = BloclyApplication.getSharedDataSource().getItems().indexOf(rssItem);
@@ -308,6 +322,8 @@ public class BloclyActivity extends ActionBarActivity implements
             itemAdapter.setExpandedItem(null);
         }
 
+        // Notify for changes --> goes to ItemAdapter's update(RssFeed, RssItem) method
+
         if (positionToContract > -1) {
             itemAdapter.notifyItemChanged(positionToContract);
         }
@@ -315,6 +331,27 @@ public class BloclyActivity extends ActionBarActivity implements
         if (positionToExpand > -1) {
             itemAdapter.notifyItemChanged(positionToExpand);
         }
+        // When there is no view to expand, avoid scrolling the RecyclerView
+        else {
+            return;
+        }
+
+        int lessToScroll = 0;
+
+        if(positionToContract > -1 && positionToContract < positionToExpand) {
+            lessToScroll = itemAdapter.getExpandedItemHeight() - itemAdapter.getCollapsedItemHeight();
+        }
+
+        // getTop() is the distance between the top of the View and top if its parent. We have a flaw
+        // because the when we press a new view, the distance of the new view to the top is measured.
+        // Then the old view is contracted and then scrolled to the new view. We are scrolling an
+        // additional distance between contracted and expanded of one view...this needs to be taken
+        // into account
+
+        // Took into account of the scroll factor with lessToScroll variable
+
+        View viewToExpand = recyclerView.getLayoutManager().findViewByPosition(positionToExpand);
+        recyclerView.smoothScrollBy(0, viewToExpand.getTop() - lessToScroll);
 
     }
 }
