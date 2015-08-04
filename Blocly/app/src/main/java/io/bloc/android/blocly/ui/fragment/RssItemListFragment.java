@@ -35,11 +35,11 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         return rssItemListFragment;
     }
 
-
     public static interface Delegate {
         public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem);
         public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem);
         public void onItemVisitClicked(RssItemListFragment rssItemListFragment, RssItem rssItem);
+        public void onItemFavoriteChecked(RssItemListFragment rssItemListFragment, RssItem rssItem);
     }
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -227,5 +227,10 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
     @Override
     public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
         delegate.get().onItemVisitClicked(this, rssItem);
+    }
+
+    @Override
+    public void onFavoriteChecked(ItemAdapter itemAdapter, RssItem rssItem) {
+        delegate.get().onItemFavoriteChecked(this, rssItem);
     }
 }

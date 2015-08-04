@@ -391,6 +391,15 @@ public class BloclyActivity extends ActionBarActivity implements
 
     }
 
+    @Override
+    public void onItemFavoriteChecked(RssItemListFragment rssItemListFragment, RssItem rssItem) {
+
+        if(rssItem.isFavorite()) {
+
+        }
+
+    }
+
     /**
      *
      * NavigationDrawerAdapterDataSource

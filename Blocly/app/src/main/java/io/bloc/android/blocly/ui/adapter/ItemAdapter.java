@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -24,6 +25,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
@@ -47,7 +49,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         public void onItemClicked(ItemAdapter itemAdapter, RssItem rssItem);
         public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem);
-
+        public void onFavoriteChecked(ItemAdapter itemAdapter, RssItem rssItem);
     }
 
     // For logcat
@@ -354,7 +356,27 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Log.v(TAG, "Checked changed to: " + isChecked);
+
+            // Delegation
+//            getDelegate().onFavoriteChecked(ItemAdapter.this, rssItem);
+
+            if(isChecked) {
+                Toast.makeText(BloclyApplication.getSharedInstance(),
+                        "Favorite Checkbox Highlighted", Toast.LENGTH_SHORT).show();
+
+                // Get the row id of that particular RssItem, and insert into the RssItemTable's COLUMN_FAVORITE column
+                    // Execute query: "INSERT INTO rss_items(COLUMN_FAVORITE) VALUES("1") WHERE COLUMN_GUID = rssItem.getGUID()"
+                // Otherwise, just change the value to default value of 0
+                    // Execute query: "INSERT INTO rss_items(COLUMN_FAVORITE) VALUES("0") WHERE COLUMN_GUID = rssItem.getGUID()"
+
+            }
+            else {
+                Toast.makeText(BloclyApplication.getSharedInstance(),
+                        "Favorite Checkbox Unchecked", Toast.LENGTH_SHORT).show();
+            }
+
+
+
         }
 
         // --- Animate Content --- //

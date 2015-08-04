@@ -245,6 +245,7 @@ public class DataSource {
         submitTask(new Runnable() {
             @Override
             public void run() {
+
                 Cursor cursor = rssItemTable.fetchRow(databaseOpenHelper.getReadableDatabase(), rowId);
 
                 if(cursor.moveToFirst()) {
@@ -266,6 +267,7 @@ public class DataSource {
                         }
                     });
                 }
+
             }
         });
 
@@ -284,10 +286,14 @@ public class DataSource {
 
                 if(cursor.moveToFirst()) {
 
-                    do {
+                    while(cursor.moveToNext()) {
                         resultList.add(itemFromCursor(cursor));
                     }
-                    while (cursor.moveToNext());
+
+//                    do {
+//                        resultList.add(itemFromCursor(cursor));
+//                    }
+//                    while (cursor.moveToNext());
 
                     cursor.close();
 
@@ -310,13 +316,13 @@ public class DataSource {
 
     }
 
-    static RssItem itemFromCursor(Cursor cursor) {
+    static RssItem itemFromCursor(final Cursor cursor) {
 
-        return new RssItem(RssItemTable.getRowId(cursor), RssItemTable.getGUID(cursor), RssItemTable.getTitle(cursor),
-                RssItemTable.getDescription(cursor), RssItemTable.getLink(cursor),
-                RssItemTable.getEnclosure(cursor), RssItemTable.getRssFeedId(cursor),
-                RssItemTable.getPubDate(cursor), RssItemTable.getFavorite(cursor),
-                RssItemTable.getArchived(cursor));
+        return new RssItem(RssItemTable.getRowId(cursor), RssItemTable.getGUID(cursor),
+                RssItemTable.getTitle(cursor), RssItemTable.getDescription(cursor),
+                RssItemTable.getLink(cursor), RssItemTable.getEnclosure(cursor),
+                RssItemTable.getRssFeedId(cursor), RssItemTable.getPubDate(cursor),
+                RssItemTable.getFavorite(cursor), RssItemTable.getArchived(cursor));
     }
 
     void submitTask(Runnable task) {

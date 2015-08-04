@@ -97,6 +97,17 @@ public class RssItemTable extends Table {
                 new String[]{String.valueOf(feedRowId)}, null, null, COLUMN_PUB_DATE + " DESC", null);
     }
 
+    public static int insertFavoriteIntoItem(SQLiteDatabase readOnlyDatabase, String guid) {
+
+        // Insert into rss_items(COLUMN_FAVORITE) VALUES("0") WHERE COLUMN_GUID = ? , String[] {guid}
+
+        ContentValues favoriteValue = new ContentValues();
+        favoriteValue.put(COLUMN_FAVORITE, "0");
+
+        return readOnlyDatabase.update(NAME, favoriteValue, COLUMN_GUID + " = ?", new String[]{guid});
+
+    }
+
     public static boolean hasItem(SQLiteDatabase readonlyDatabase, String guId) {
 
         Cursor query = readonlyDatabase.query(true, NAME, new String[]{COLUMN_GUID},

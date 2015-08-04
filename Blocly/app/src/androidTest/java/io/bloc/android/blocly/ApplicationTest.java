@@ -43,4 +43,15 @@ public class ApplicationTest extends ApplicationTestCase<BloclyApplication> {
         assertTrue(ImageLoader.getInstance().isInited());
 
     }
+
+    public void testFavoriteCheckboxFunction() {
+
+        // When user presses the checkbox, make it function
+        // If checked, store as 1 in database RssItemTable
+        // If unchecked, (by default or after checked), change value to 0 for RssItemTable
+        // get the RowId of that particular item and insert it into RssItemTable.
+        // if unchecked, get the RowID and insert new value into the RssItemTable.
+
+    }
+
 }
