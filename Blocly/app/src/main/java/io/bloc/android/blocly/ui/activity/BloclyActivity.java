@@ -3,6 +3,8 @@ package io.bloc.android.blocly.ui.activity;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,8 +27,11 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.api.model.database.DatabaseOpenHelper;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
+import io.bloc.android.blocly.api.model.database.table.RssFeedTable;
+import io.bloc.android.blocly.api.model.database.table.RssItemTable;
 
 // ActionBarActivity is required to use when I have Theme.AppCompat in the styles.xml
 // This has backwards compatible features
@@ -52,6 +57,10 @@ public class BloclyActivity extends ActionBarActivity implements
     private View overflowButton;
 
     private RecyclerView recyclerView;
+
+    private RssFeedTable rssFeedTable;
+    private RssItemTable rssItemTable;
+    private DatabaseOpenHelper databaseOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +232,12 @@ public class BloclyActivity extends ActionBarActivity implements
         itemAdapter.setDataSource(this);
         itemAdapter.setDelegate(this);
 
+        // Query method
+
+        databaseOpenHelper = new DatabaseOpenHelper(BloclyApplication.getSharedInstance(), rssFeedTable, rssItemTable);
+        SQLiteDatabase db = databaseOpenHelper.getWritableDatabase();
+        Cursor testQuery = db.query(true, "rss_items", null, null, null, null, null, "pub_date DESC", "10", null);
+        testQuery.close();
     }
 
     // When Options menu is created, inflate the blocly menu layout
