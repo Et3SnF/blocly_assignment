@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -28,18 +27,16 @@ import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
-import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
+import io.bloc.android.blocly.ui.fragment.RssItemListFragment;
 
 // ActionBarActivity is required to use when I have Theme.AppCompat in the styles.xml
 // This has backwards compatible features
 
 public class BloclyActivity extends ActionBarActivity implements
-        NavigationDrawerAdapter.NavigationDrawerAdapterDelegate, ItemAdapter.DataSource,
-        ItemAdapter.Delegate, NavigationDrawerAdapter.NavigationDrawerAdapterDataSource {
-
-    private ItemAdapter itemAdapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+        NavigationDrawerAdapter.NavigationDrawerAdapterDelegate,
+        NavigationDrawerAdapter.NavigationDrawerAdapterDataSource,
+        RssItemListFragment.Delegate {
 
     // Variables for drawer layout
 
@@ -55,10 +52,8 @@ public class BloclyActivity extends ActionBarActivity implements
     private Menu menu;
     private View overflowButton;
 
-    private RecyclerView recyclerView;
-
     private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
-    private List<RssItem> currentItems = new ArrayList<RssItem>();
+    private RssItem expandedItem = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,18 +65,6 @@ public class BloclyActivity extends ActionBarActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
 
-        // Adapter for RecyclerView
-
-        itemAdapter = new ItemAdapter();
-
-        // Display the recyclerView, which contains the adapter, layout manager, and animator
-
-        recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
-        // #12
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(itemAdapter);
-
         // Integrate drawer layout below. We have to do this here b/c it doesn't apply to just
         // that viewholder in ItemAdapter.java. Whole different story
 
@@ -89,7 +72,6 @@ public class BloclyActivity extends ActionBarActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
-
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0) {
 
             // Created an anonymous class to add actions when drawer is opened and closed
@@ -119,7 +101,7 @@ public class BloclyActivity extends ActionBarActivity implements
                     // For drawer not to interfere with the share icon behavior
                     // After closing the drawer, do not enable share action if no items are expanded!
 
-                    if(item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null) {
+                    if(item.getItemId() == R.id.action_share && expandedItem == null) {
                         continue;
                     }
 
@@ -130,9 +112,7 @@ public class BloclyActivity extends ActionBarActivity implements
                     if(icon != null) {
                         icon.setAlpha(255);
                     }
-
                 }
-
             }
 
             @Override
@@ -192,7 +172,7 @@ public class BloclyActivity extends ActionBarActivity implements
                     // Do not change the opacity of the share icon if it wasn't visible in the first
                     // place!
 
-                    if(item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null) {
+                    if(item.getItemId() == R.id.action_share && expandedItem == null) {
                         continue;
                     }
 
@@ -221,65 +201,30 @@ public class BloclyActivity extends ActionBarActivity implements
         navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
         navigationRecyclerView.setAdapter(navigationDrawerAdapter);
 
+        BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
+
+            @Override
+            public void onSuccess(List<RssFeed> rssFeeds) {
+
+                allFeeds.addAll(rssFeeds);
+                navigationDrawerAdapter.notifyDataSetChanged();
+
+                getFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeeds.get(0)))
+                        .commit();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+
+            }
+        });
+
         // Set the delegate class
 
         navigationDrawerAdapter.setDelegate(this);
         navigationDrawerAdapter.setDataSource(this);
-
-        // Set the delegate
-
-        itemAdapter.setDataSource(this);
-        itemAdapter.setDelegate(this);
-
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_activity_blocly);
-        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red_50));
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
-//                  BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.ign.com/ign/all?format=xml",
-
-                        new DataSource.Callback<RssFeed>() {
-                            @Override
-                            public void onSuccess(RssFeed rssFeed) {
-
-                                if (isFinishing() || isDestroyed()) {
-                                    return;
-                                }
-
-                                allFeeds.add(rssFeed);
-                                navigationDrawerAdapter.notifyDataSetChanged();
-
-                                BloclyApplication.getSharedDataSource().fetchItemsForFeed(rssFeed,
-                                        new DataSource.Callback<List<RssItem>>() {
-                                            @Override
-                                            public void onSuccess(List<RssItem> rssItems) {
-
-                                                if (isFinishing() || isDestroyed()) {
-                                                    return;
-                                                }
-
-                                                currentItems.addAll(rssItems);
-                                                itemAdapter.notifyItemRangeInserted(0, currentItems.size());
-                                                swipeRefreshLayout.setRefreshing(false);
-                                            }
-
-                                            @Override
-                                            public void onError(String errorMessage) {
-                                                swipeRefreshLayout.setRefreshing(false);
-                                            }
-                                        });
-                            }
-
-                            @Override
-                            public void onError(String errorMessage) {
-                                Toast.makeText(BloclyActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                                swipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
-            }
-        });
 
     }
 
@@ -290,7 +235,7 @@ public class BloclyActivity extends ActionBarActivity implements
 
         getMenuInflater().inflate(R.menu.blocly, menu);
         this.menu = menu;
-        animateShareItem(itemAdapter.getExpandedItem() != null); //animate share icon when expanded
+        animateShareItem(expandedItem != null); //animate share icon when expanded
         return super.onCreateOptionsMenu(menu);
 
     }
@@ -321,7 +266,7 @@ public class BloclyActivity extends ActionBarActivity implements
 
         if(item.getItemId() == R.id.action_share) {
 
-            RssItem itemToShare = itemAdapter.getExpandedItem();
+            RssItem itemToShare = expandedItem;
 
             if(itemToShare == null) {
                 return false;
@@ -363,110 +308,27 @@ public class BloclyActivity extends ActionBarActivity implements
 
     /**
      *
-     * DataSource method implementation
+     * RssListFragment.Delegate
      *
      */
 
     @Override
-    public int getItemCount(ItemAdapter itemAdapter) {
-        return currentItems.size();
+    public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem) {
+        expandedItem = rssItem;
+        animateShareItem(expandedItem != null);
+    }
+
+    public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem) {
+
+        if (expandedItem == rssItem) {
+            expandedItem = null;
+        }
+
+        animateShareItem(expandedItem != null);
     }
 
     @Override
-    public RssItem getRssItem(ItemAdapter itemAdapter, int position) {
-        return currentItems.get(position);
-    }
-
-    @Override
-    public RssFeed getRssFeed(ItemAdapter itemAdapter, int position) {
-
-        RssItem rssItem = currentItems.get(position);
-
-        for(RssFeed feed : allFeeds) {
-
-            if(rssItem.getRssFeedId() == feed.getRowId()) {
-                return feed;
-            }
-
-        }
-
-        return null;
-    }
-
-    /**
-     *
-     * Delegate method implementation
-     *
-     */
-
-    @Override
-    public void onItemClicked(ItemAdapter itemAdapter, RssItem rssItem) {
-
-        int positionToExpand = -1;
-        int positionToContract = -1;
-
-        // If view is already opened, contract it
-
-        if (itemAdapter.getExpandedItem() != null) {
-            positionToContract = currentItems.indexOf(itemAdapter.getExpandedItem());
-
-            View viewToContract = recyclerView.getLayoutManager().findViewByPosition(positionToContract);
-
-            if(viewToContract == null) {
-                positionToContract = -1;
-            }
-
-        }
-
-        // If view is selected, recover the position. Then set the expanded item.
-        // When the user clicks on the expanded item, contract it. (null)
-
-        if (itemAdapter.getExpandedItem() != rssItem) {
-            positionToExpand = currentItems.indexOf(rssItem);
-            itemAdapter.setExpandedItem(rssItem);
-        }
-        else {
-            itemAdapter.setExpandedItem(null);
-        }
-
-        // Notify for changes --> goes to ItemAdapter's update(RssFeed, RssItem) method
-
-        if (positionToContract > -1) {
-            itemAdapter.notifyItemChanged(positionToContract);
-
-        }
-
-        if (positionToExpand > -1) {
-            itemAdapter.notifyItemChanged(positionToExpand);
-            animateShareItem(true);
-        }
-        // When there is no view to expand, avoid scrolling the RecyclerView
-        else {
-            animateShareItem(false);
-            return;
-        }
-
-        int lessToScroll = 0;
-
-        if(positionToContract > -1 && positionToContract < positionToExpand) {
-            lessToScroll = itemAdapter.getExpandedItemHeight() - itemAdapter.getCollapsedItemHeight();
-        }
-
-        // getTop() is the distance between the top of the View and top if its parent. We have a flaw
-        // because the when we press a new view, the distance of the new view to the top is measured.
-        // Then the old view is contracted and then scrolled to the new view. We are scrolling an
-        // additional distance between contracted and expanded of one view...this needs to be taken
-        // into account
-
-        // Took into account of the scroll factor with lessToScroll variable
-
-        View viewToExpand = recyclerView.getLayoutManager().findViewByPosition(positionToExpand);
-        recyclerView.smoothScrollBy(0, viewToExpand.getTop() - lessToScroll);
-
-    }
-
-    @Override
-    public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
+    public void onItemVisitClicked(RssItemListFragment rssItemListFragment, RssItem rssItem) {
 
         Intent visitIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssItem.getUrl()));
         startActivity(visitIntent);
