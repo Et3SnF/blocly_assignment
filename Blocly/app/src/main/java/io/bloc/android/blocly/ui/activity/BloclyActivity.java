@@ -1,6 +1,7 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -13,6 +14,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +56,8 @@ public class BloclyActivity extends ActionBarActivity implements
 
     private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
     private RssItem expandedItem = null;
+
+    private FragmentManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +215,8 @@ public class BloclyActivity extends ActionBarActivity implements
 
                 getFragmentManager()
                         .beginTransaction()
-                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeeds.get(0)))
+                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeeds.get(0)),
+                                "main_fragment")
                         .commit();
             }
 
@@ -226,6 +231,18 @@ public class BloclyActivity extends ActionBarActivity implements
         navigationDrawerAdapter.setDelegate(this);
         navigationDrawerAdapter.setDataSource(this);
 
+        manager = getFragmentManager();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(manager.getBackStackEntryCount() > 0) {
+            manager.popBackStack();
+        }
+        else {
+            super.onBackPressed();
+        }
     }
 
     // When Options menu is created, inflate the blocly menu layout
@@ -301,9 +318,63 @@ public class BloclyActivity extends ActionBarActivity implements
     }
 
     @Override
-    public void didSelectFeed(NavigationDrawerAdapter navigationDrawerAdapter, RssFeed rssFeed) {
+    public void didSelectFeed(final NavigationDrawerAdapter navigationDrawerAdapter, final RssFeed rssFeed) {
         drawerLayout.closeDrawers();
-        Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
+
+        if(rssFeed.equals(rssFeed)) {
+            Log.v("Fragment Log", "You have selected the same feed");
+            return;
+        }
+        else if(getFragmentManager().getBackStackEntryCount() > 0 && !rssFeed.equals(rssFeed)) {
+
+            final RssItemListFragment fragment_switch = (RssItemListFragment) getFragmentManager()
+                    .findFragmentByTag(String.valueOf(rssFeed.getRowId()));
+
+            BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
+
+                @Override
+                public void onSuccess(List<RssFeed> rssFeeds) {
+
+                    allFeeds.addAll(rssFeeds);
+                    navigationDrawerAdapter.notifyDataSetChanged();
+
+                    manager.beginTransaction()
+                            .replace(R.id.fl_activity_blocly, fragment_switch)
+                            .addToBackStack(String.valueOf(rssFeed.getRowId())).commit();
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    Log.v("Fragment Log", "Could not find fragment.");
+                }
+            });
+
+        }
+        else {
+
+            final RssItemListFragment fragment = RssItemListFragment.fragmentForRssFeed(rssFeed);
+
+            BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
+
+                @Override
+                public void onSuccess(List<RssFeed> rssFeeds) {
+
+                    allFeeds.addAll(rssFeeds);
+                    navigationDrawerAdapter.notifyDataSetChanged();
+
+                    manager.beginTransaction()
+                            .replace(R.id.fl_activity_blocly, fragment)
+                            .addToBackStack(String.valueOf(rssFeed.getRowId())).commit();
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    Log.v("Fragment Log", "Could not find fragment.");
+                }
+            });
+
+        }
+
     }
 
     /**

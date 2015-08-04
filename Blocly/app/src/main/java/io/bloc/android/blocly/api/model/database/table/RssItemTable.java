@@ -97,13 +97,12 @@ public class RssItemTable extends Table {
                 new String[]{String.valueOf(feedRowId)}, null, null, COLUMN_PUB_DATE + " DESC", null);
     }
 
-    public static boolean hasItem(SQLiteDatabase readOnlyDatabase, String guId) {
-
-        Cursor query = readOnlyDatabase.query(true, NAME, new String[] {COLUMN_GUID}, COLUMN_GUID + " = ?",
-                new String[]{guId}, null, null, null, null);
+    public static boolean hasItem(SQLiteDatabase readonlyDatabase, String guId) {
+        Cursor query = readonlyDatabase.query(true, NAME, new String[]{COLUMN_GUID},
+                COLUMN_GUID + " = ?", new String[]{guId},
+                null, null, null, null);
         boolean hasItem = query.moveToFirst();
         query.close();
-
         return hasItem;
     }
 

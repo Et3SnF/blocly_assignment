@@ -35,12 +35,9 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         return rssItemListFragment;
     }
 
-
     public static interface Delegate {
         public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem);
-
         public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem);
-
         public void onItemVisitClicked(RssItemListFragment rssItemListFragment, RssItem rssItem);
     }
 
@@ -116,7 +113,7 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
 
                                 if (!rssItems.isEmpty()) {
                                     currentItems.addAll(0, rssItems);
-                                    itemAdapter.notifyItemRangeInserted(0, rssItems.size());
+                                    itemAdapter.notifyDataSetChanged();
                                 }
 
                                 swipeRefreshLayout.setRefreshing(false);
@@ -133,6 +130,28 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(itemAdapter);
+    }
+
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     /**
@@ -160,7 +179,6 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
 
     @Override
     public void onItemClicked(ItemAdapter itemAdapter, RssItem rssItem) {
-
         int positionToExpand = -1;
         int positionToContract = -1;
 
@@ -171,7 +189,6 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
             if (viewToContract == null) {
                 positionToContract = -1;
             }
-
         }
 
         if (itemAdapter.getExpandedItem() != rssItem) {
@@ -198,7 +215,6 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         View viewToExpand = recyclerView.getLayoutManager().findViewByPosition(positionToExpand);
 
         int lessToScroll = 0;
-
         if (positionToContract > -1 && positionToContract < positionToExpand) {
             lessToScroll = itemAdapter.getExpandedItemHeight() - itemAdapter.getCollapsedItemHeight();
         }
@@ -210,4 +226,6 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
     public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
         delegate.get().onItemVisitClicked(this, rssItem);
     }
+
+
 }
