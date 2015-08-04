@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- THIS XML IS TO CHANGE THE COLOR OF THE TEXT IN THE DRAWER WHEN PRESSED. NOTHING MORE -->
+
+    <!-- Pressed state -->
+
+    <item
+        android:state_selected="true"
+        android:color="@color/red_50"/>
+
+    <!-- Default state -->
+
+    <item
+        android:color="@color/white_87"/>
+
+</selector>

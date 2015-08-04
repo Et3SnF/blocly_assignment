@@ -31,5 +31,6 @@
     <color name ="green_50">#8000FF00</color>
 
     <color name ="drawer_color">#E5111111</color>
+    <color name="drawer_divider">@color/white_54</color>
 
 </resources>

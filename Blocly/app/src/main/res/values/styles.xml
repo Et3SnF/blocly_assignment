@@ -24,7 +24,11 @@
 
     <style name = "DrawerArrow" parent = "Base.Widget.AppCompat.DrawerArrowToggle">
 
-        <item name ="color">@color/white_87</item>
+        <item name ="color">@color/red_50</item>
+        <item name="middleBarArrowSize">16dp</item>
+        <item name="spinBars">true</item>
+        <item name="thickness">1dp</item>
+        <item name="topBottomBarArrowSize">15dp</item>
 
     </style>
 
@@ -64,6 +68,25 @@
         <item name = "android:textColor">@drawable/btn_text_drawable</item>
         <item name = "android:textSize">14sp</item>
         <item name = "android:textAllCaps">true</item>
+        <item name = "robotoFont">Medium</item>
+
+    </style>
+
+    <!-- Style for the text in the Drawer (font, size, and alignment) -->
+    <!-- Text color is a drawable from navigation_item_text.xml drawable -->
+
+    <style name = "NavigationItem">
+
+        <item name = "android:textSize">14sp</item>
+
+        <!-- Change text color when pressed. Use drawable -->
+
+        <item name = "android:textColor">@drawable/navigation_item_text</item>
+        <item name = "android:singleLine">true</item>
+        <item name = "android:gravity">center_vertical</item>
+
+        <!-- This is the custom font -->
+
         <item name = "robotoFont">Medium</item>
 
     </style>

@@ -33,14 +33,11 @@
 
     <!-- TextView for the Drawer -->
 
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_nav_activity_blocly"
         android:layout_width="280dp"
         android:layout_height="match_parent"
-        android:text="@string/drawer_message"
-        android:textSize="32sp"
-        android:gravity="center"
-        android:layout_gravity = "left"
-        android:textColor="@color/white_87"
-        android:background="@color/drawer_color"/>
+        android:background="@color/drawer_color"
+        android:layout_gravity="left"/>
 
 </android.support.v4.widget.DrawerLayout>
