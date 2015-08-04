@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+
+import io.bloc.android.blocly.api.model.RssFeed;
+import io.bloc.android.blocly.api.model.RssItem;
 
 public abstract class NetworkRequest<Result> {
 
@@ -21,7 +25,7 @@ public abstract class NetworkRequest<Result> {
         return errorCode;
     }
 
-    public abstract Result performRequest();
+    public abstract Result performRequest(List<RssFeed> feed, List<RssItem> item);
 
     protected InputStream openStream(String urlString) {
 

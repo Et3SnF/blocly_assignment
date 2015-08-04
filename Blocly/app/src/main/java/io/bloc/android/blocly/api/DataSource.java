@@ -7,7 +7,7 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
-import io.bloc.android.blocly.api.network.GetFeedsNetworkRequest;
+import io.bloc.android.blocly.api.network.FeedsNetworkRequest;
 
 public class DataSource {
 
@@ -17,14 +17,14 @@ public class DataSource {
     public DataSource() {
         feeds = new ArrayList<RssFeed>();
         items = new ArrayList<RssItem>();
-        createFakeData();
+        //createFakeData();
 
         new Thread(new Runnable() {
 
             @Override
             public void run() {
-                new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml")
-                        .performRequest();
+                new FeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml")
+                        .performRequest(feeds, items);
             }
 
         }).start();
@@ -40,17 +40,20 @@ public class DataSource {
     }
 
     void createFakeData() {
+
         feeds.add(new RssFeed("My Favorite Feed",
                 "This feed is just incredible, I can't even begin to tell you…",
                 "http://favoritefeed.net", "http://feeds.feedburner.com/favorite_feed?format=xml"));
 
         for (int i = 0; i < 10; i++) {
+
             items.add(new RssItem(String.valueOf(i),
                     BloclyApplication.getSharedInstance().getString(R.string.placeholder_headline) + " #" + (i+1),
                     BloclyApplication.getSharedInstance().getString(R.string.placeholder_content),
                     "http://favoritefeed.net?story_id=an-incredible-news-story",
                     "http://rs1img.memecdn.com/silly-dog_o_511213.jpg",
                     0, System.currentTimeMillis(), false, false));
+
         }
 
     }
