@@ -60,6 +60,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         RssItem rssItem;
 
+        boolean bgSwitch;
+
         public ItemAdapterViewHolder(View itemView) {
             super(itemView);
 
@@ -141,6 +143,18 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         public void onClick(View view) {
 
             Toast.makeText(view.getContext(), rssItem.getTitle(), Toast.LENGTH_SHORT).show();
+
+            // Switch for changing viewholder background when pressed
+
+            bgSwitch = !bgSwitch;
+
+            if(bgSwitch) {
+                view.setBackgroundColor(view.getResources().getColor(R.color.blue_50));
+            }
+            else if (!bgSwitch) {
+                view.setBackgroundColor(view.getResources().getColor(R.color.transparent));
+            }
+
 
         }
 

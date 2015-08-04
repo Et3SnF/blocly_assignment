@@ -29,5 +29,6 @@
     <color name ="red_50">#80FF0000</color>
     <color name ="blue_50">#800000FF</color>
     <color name ="green_50">#8000FF00</color>
+    <color name ="transparent">#00000000</color>
 
 </resources>

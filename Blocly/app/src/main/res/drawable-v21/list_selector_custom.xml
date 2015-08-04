@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Pressed state -->
+
+    <item
+        android:state_pressed = "true"
+        android:state_checked = "false"
+        android:drawable="@color/red_50">
+
+        <shape
+            android:shape = "oval"/>
+
+        <padding
+            android:left="8dp"
+            android:right = "8dp"
+            android:bottom = "8dp"
+            android:top="8dp"/>
+
+    </item>
+
+    <!-- Default State -->
+
+    <item
+        android:drawable="@android:color/transparent"/>
+
+</selector>
