@@ -47,6 +47,8 @@ public class BloclyActivity extends ActionBarActivity implements
     private Menu menu;
     private View overflowButton;
 
+    private RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +65,7 @@ public class BloclyActivity extends ActionBarActivity implements
 
         // Display the recyclerView, which contains the adapter, layout manager, and animator
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
+        recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
         // #12
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -303,6 +305,7 @@ public class BloclyActivity extends ActionBarActivity implements
         if (itemAdapter.getExpandedItem() != rssItem) {
             positionToExpand = BloclyApplication.getSharedDataSource().getItems().indexOf(rssItem);
             itemAdapter.setExpandedItem(rssItem);
+            recyclerView.scrollToPosition(positionToExpand + 1);
         }
         else {
             itemAdapter.setExpandedItem(null);
