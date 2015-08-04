@@ -20,6 +20,8 @@ public class BloclyActivity extends Activity {
 
         itemAdapter = new ItemAdapter();
 
+        // Display the recyclerView, which contains the adapter, layout manager, and animator
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
         // #12
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
