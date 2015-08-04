@@ -2,12 +2,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Unchecked and pressed -->
-
+<!--
     <item
         android:drawable="@drawable/btn_check_unchecked_pressed"
         android:state_checked="false"
         android:state_pressed="true"/>
-
+-->
     <!-- Checked and unpressed -->
 
     <item
@@ -16,12 +16,12 @@
         android:state_pressed="false"/>
 
     <!-- Checked and pressed -->
-
+<!--
     <item
         android:drawable="@drawable/btn_check_checked_pressed"
         android:state_checked="true"
         android:state_pressed="true"/>
-
+-->
     <!-- Default state - Unchecked and Unpressed -->
 
     <item
