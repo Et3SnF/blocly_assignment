@@ -238,6 +238,7 @@ public class BloclyActivity extends ActionBarActivity implements
             @Override
             public void onRefresh() {
                 BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+//                  BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.ign.com/ign/all?format=xml",
 
                         new DataSource.Callback<RssFeed>() {
                             @Override
