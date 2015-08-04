@@ -38,9 +38,7 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
 
     public static interface Delegate {
         public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem);
-
         public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem);
-
         public void onItemVisitClicked(RssItemListFragment rssItemListFragment, RssItem rssItem);
     }
 
@@ -78,6 +76,24 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
             @Override
             public void onSuccess(RssFeed rssFeed) {
                 currentFeed = rssFeed;
+
+                if(currentItems.isEmpty()) {
+
+                    BloclyApplication.getSharedDataSource().fetchItemsForFeed(currentFeed,
+                            new DataSource.Callback<List<RssItem>>() {
+                                @Override
+                                public void onSuccess(List<RssItem> rssItems) {
+                                    currentItems.addAll(rssItems);
+                                    itemAdapter.notifyDataSetChanged();
+                                }
+
+                                @Override
+                                public void onError(String errorMessage) {
+
+                                }
+                            });
+                }
+
             }
 
             @Override
@@ -100,6 +116,8 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         super.onActivityCreated(savedInstanceState);
 
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red_50));
+        swipeRefreshLayout.setProgressBackgroundColorSchemeColor(getResources()
+                .getColor(R.color.action_bar_color));
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
             @Override

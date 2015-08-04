@@ -25,7 +25,8 @@
     <color name ="action_bar_color">#333333</color>
     <color name ="status_bar_color">#80333333</color>
     <color name ="navigation_bar_color">#80FF0000</color>
-    <color name ="background_color">#80111111</color>
+    <color name ="background_color">#111111</color>
+    <color name ="tablet_description_background">#222222</color>
     <color name ="red_50">#80FF0000</color>
     <color name ="blue_50">#800000FF</color>
     <color name ="green_50">#8000FF00</color>

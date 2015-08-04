@@ -28,6 +28,7 @@ import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
+import io.bloc.android.blocly.ui.fragment.RssItemDetailFragment;
 import io.bloc.android.blocly.ui.fragment.RssItemListFragment;
 
 // ActionBarActivity is required to use when I have Theme.AppCompat in the styles.xml
@@ -55,14 +56,19 @@ public class BloclyActivity extends ActionBarActivity implements
     private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
     private RssItem expandedItem = null;
 
+    private boolean onTablet;
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
 
+        onTablet = findViewById(R.id.fl_activity_blocly_right_pane) != null;
+
         // Add the toolbar support here
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
+        toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
 
         // Integrate drawer layout below. We have to do this here b/c it doesn't apply to just
@@ -196,6 +202,8 @@ public class BloclyActivity extends ActionBarActivity implements
             // Remember: The RecyclerView needs 4 things: adapter, LayoutManager, animator, and its layout
 
         navigationDrawerAdapter = new NavigationDrawerAdapter();
+        navigationDrawerAdapter.setDelegate(this);
+        navigationDrawerAdapter.setDataSource(this);
         RecyclerView navigationRecyclerView = (RecyclerView) findViewById(R.id.rv_nav_activity_blocly);
         navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -204,15 +212,46 @@ public class BloclyActivity extends ActionBarActivity implements
         BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
 
             @Override
-            public void onSuccess(List<RssFeed> rssFeeds) {
+            public void onSuccess(final List<RssFeed> rssFeeds) {
 
-                allFeeds.addAll(rssFeeds);
-                navigationDrawerAdapter.notifyDataSetChanged();
+                // For fake data addition and prevent a crash if cache and data is cleared
 
-                getFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeeds.get(0)))
-                        .commit();
+                if(rssFeeds == null || rssFeeds.isEmpty()) {
+
+                    final String dummyFeedURL = "http://feeds.feedburner.com/androidcentral?format=xml";
+
+                    BloclyApplication.getSharedDataSource()
+                            .fetchNewFeed(dummyFeedURL,
+                                    new DataSource.Callback<RssFeed>() {
+                                        @Override
+                                        public void onSuccess(RssFeed rssFeed) {
+                                            rssFeeds.add(rssFeed);
+                                            allFeeds.addAll(rssFeeds);
+                                            navigationDrawerAdapter.notifyDataSetChanged();
+
+                                            getFragmentManager()
+                                                    .beginTransaction()
+                                                    .replace(R.id.fl_activity_blocly, RssItemListFragment
+                                                            .fragmentForRssFeed(rssFeeds.get(0)))
+                                                    .commit();
+                                        }
+
+                                        @Override
+                                        public void onError(String errorMessage) {
+
+                                        }
+                                    });
+                }
+                else {
+                    allFeeds.addAll(rssFeeds);
+                    navigationDrawerAdapter.notifyDataSetChanged();
+
+                    getFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeeds.get(0)))
+                            .commit();
+                }
+
             }
 
             @Override
@@ -221,11 +260,6 @@ public class BloclyActivity extends ActionBarActivity implements
             }
         });
 
-        // Set the delegate class
-
-        navigationDrawerAdapter.setDelegate(this);
-        navigationDrawerAdapter.setDataSource(this);
-
     }
 
     // When Options menu is created, inflate the blocly menu layout
@@ -233,7 +267,7 @@ public class BloclyActivity extends ActionBarActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.blocly, menu);
+        getMenuInflater().inflate(R.menu.blocly_w960dp, menu);
         this.menu = menu;
         animateShareItem(expandedItem != null); //animate share icon when expanded
         return super.onCreateOptionsMenu(menu);
@@ -315,6 +349,15 @@ public class BloclyActivity extends ActionBarActivity implements
     @Override
     public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem) {
         expandedItem = rssItem;
+
+        if (onTablet) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fl_activity_blocly_right_pane, RssItemDetailFragment.detailFragmentForRssItem(rssItem))
+                    .commit();
+
+            return;
+        }
+
         animateShareItem(expandedItem != null);
     }
 

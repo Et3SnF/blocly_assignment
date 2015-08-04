@@ -37,7 +37,7 @@
         android:id="@+id/rv_nav_activity_blocly"
         android:layout_width="210dp"
         android:layout_height="match_parent"
-        android:background="@color/drawer_color"
+        android:background="@color/background_color"
         android:layout_gravity="left"/>
 
 </android.support.v4.widget.DrawerLayout>

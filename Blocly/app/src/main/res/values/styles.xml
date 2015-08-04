@@ -56,6 +56,23 @@
 
     </style>
 
+    <!-- For the tablet -->
+
+    <style name="RssItemTitle" parent="Base.TextAppearance.AppCompat.Body2">
+        <item name="android:textColor">@color/white_54</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="robotoFont">Medium</item>
+    </style>
+
+    <style name="RssItemDetailHeader" parent="Base.TextAppearance.AppCompat.Display1">
+        <item name="android:textColor">@color/white_87</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!--- -->
+
     <style name="Caption">
 
         <item name="android:textColor">@color/red_50</item>

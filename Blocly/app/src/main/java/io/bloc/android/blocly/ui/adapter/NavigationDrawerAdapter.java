@@ -29,10 +29,8 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     // Interfaces to delegate to another class
 
     public static interface NavigationDrawerAdapterDelegate {
-
         public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationOption navigationOption);
         public void didSelectFeed(NavigationDrawerAdapter navigationDrawerAdapter, RssFeed rssFeed);
-
     }
 
     // Store the delegate. Allows the use of an object as long as strong reference to it exists

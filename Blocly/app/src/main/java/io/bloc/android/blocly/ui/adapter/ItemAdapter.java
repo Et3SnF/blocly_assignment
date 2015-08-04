@@ -2,11 +2,14 @@ package io.bloc.android.blocly.ui.adapter;
 
 import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
+import android.graphics.Outline;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -18,10 +21,13 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.ui.UIUtils;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterViewHolder> {
 
@@ -48,7 +54,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
     private static String TAG = ItemAdapter.class.getSimpleName();
 
-    // For persisting state
+    // For mapping colors
+
+    private Map<Long, Integer> rssFeedToColor = new HashMap<Long, Integer>();
+
+    // Related to items and feeds
 
     private RssItem expandedItem = null;
     private WeakReference<Delegate> delegate;
@@ -160,76 +170,79 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         // --- Member variables for the view holder --- //
 
-        // TextView variables
+        boolean onTablet;
+        boolean contentExpanded;
 
         TextView title;
-        TextView feed;
         TextView content;
 
-        // ImageView variables
-
+        TextView feed;
         View headerWrapper;
         ImageView headerImage;
-
-        // Checkbox Variables
 
         CheckBox archiveCheckbox;
         CheckBox favoriteCheckbox;
 
-        // Variable to pull information from RssItem.java
-
-        RssItem rssItem;
-
-        // Boolean variable to either allow expanded view or not
-
-        boolean contentExpanded;
-
-        // Variables for the expanded content
-
         View expandedContentWrapper;
         TextView expandedContent;
         TextView visitSite;
+
+        // For Tablet
+
+        TextView callout;
+
+        RssItem rssItem;
 
         // Constructor
 
         public ItemAdapterViewHolder(View itemView) {
             super(itemView);
 
-            // Declare TextView variables to layout
+            // Inflate the views from rss_item.xml (both kinds)
 
             title = (TextView) itemView.findViewById(R.id.tv_rss_item_title);
-            feed = (TextView) itemView.findViewById(R.id.tv_rss_item_feed_title);
             content = (TextView) itemView.findViewById(R.id.tv_rss_item_content);
 
-            // Declare Image Library variables to layout
+            // FOR PHONE VIEWS
+            // The id in the if-statement is exclusive to the phone layout only!
 
-            headerWrapper = itemView.findViewById(R.id.fl_rss_item_image_header);
-            headerImage = (ImageView) headerWrapper.findViewById(R.id.iv_rss_item_image);
+            if(itemView.findViewById(R.id.tv_rss_item_feed_title) != null) {
+                feed = (TextView) itemView.findViewById(R.id.tv_rss_item_feed_title);
+                headerWrapper = itemView.findViewById(R.id.fl_rss_item_image_header);
+                headerImage = (ImageView) headerWrapper.findViewById(R.id.iv_rss_item_image);
+                archiveCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_check_mark);
+                favoriteCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_favorite_star);
+                expandedContentWrapper = itemView.findViewById(R.id.ll_rss_item_expanded_content_wrapper);
+                expandedContent = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_content_full);
+                visitSite = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_visit_site);
+                visitSite.setOnClickListener(this);
+                archiveCheckbox.setOnCheckedChangeListener(this);
+                favoriteCheckbox.setOnCheckedChangeListener(this);
+            }
+            else {
 
-            // Declare expanded content variables to layout
+                // For Tablet View
+                onTablet = true;
+                callout = (TextView) itemView.findViewById(R.id.tv_rss_item_callout);
 
-            expandedContentWrapper = itemView.findViewById(R.id.ll_rss_item_expanded_content_wrapper);
-            expandedContent = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_content_full);
-            visitSite = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_visit_site);
+                // Need this check to check API version otherwise a RunTimeException occurs
 
-            // Declare CheckBox variables to layout
+                if(Build.VERSION.SDK_INT >= 21) {
 
-            archiveCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_check_mark);
-            favoriteCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_favorite_star);
+                    callout.setOutlineProvider(new ViewOutlineProvider() {
+                        @Override
+                        public void getOutline(View view, Outline outline) {
+                            outline.setOval(0,0, view.getWidth(), view.getHeight());
+                        }
+                    });
 
-            // Activate clickListener for whole ViewHolder
+                    callout.setClipToOutline(true);
+                }
+            }
+
+            // Leave this here...this is for the recyclerview
 
             itemView.setOnClickListener(this);
-
-            // Activate Listeners for checkboxes
-
-            archiveCheckbox.setOnCheckedChangeListener(this);
-            favoriteCheckbox.setOnCheckedChangeListener(this);
-
-            // Activate listener for Visit Site link
-
-            visitSite.setOnClickListener(this);
-
         }
 
         void update(RssFeed rssFeed, RssItem rssItem) {
@@ -238,12 +251,29 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
             // Update TextView
 
-            feed.setText(rssFeed.getTitle());
             title.setText(rssItem.getTitle());
 
                 // This is the content when previewed (restricted to 3 lines)
 
             content.setText(rssItem.getDescription());
+
+            if(onTablet) {
+//                callout.setText("" + rssFeed.getTitle().toUpperCase().charAt(0));
+//                Integer color = rssFeedToColor.get(rssFeed.getRowId());
+
+                callout.setText("" + rssItem.getTitle().toUpperCase().charAt(0));
+                Integer color = rssFeedToColor.get(rssItem.getRowId());
+
+                if(color == null) {
+                    color = UIUtils.generateRandomColor(itemView.getResources().getColor(android.R.color.white));
+                    rssFeedToColor.put(rssFeed.getRowId(), color);
+                }
+
+                callout.setBackgroundColor(color);
+                return;
+            }
+
+            feed.setText(rssFeed.getTitle());
 
                 // This is when the content when expanded
 

@@ -73,16 +73,77 @@ public class DataSource {
         }
     }
 
+    public void fetchFeedWithId(final long rowId, final Callback<RssFeed> callback) {
+
+        final Handler callbackThreadHandler = new Handler();
+
+        submitTask(new Runnable() {
+            @Override
+            public void run() {
+
+                Cursor cursor = rssFeedTable.fetchRow(databaseOpenHelper.getReadableDatabase(), rowId);
+
+                if (cursor.moveToFirst()) {
+                    final RssFeed rssFeed = feedFromCursor(cursor);
+                    cursor.close();
+                    callbackThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSuccess(rssFeed);
+                        }
+                    });
+                }
+                else {
+                    callbackThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onError("RSS feed not found for row Id (" + rowId + ")");
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void fetchAllFeeds(final Callback<List<RssFeed>> callback) {
+
+        final Handler callbackThreadHandler = new Handler();
+
+        submitTask(new Runnable() {
+            @Override
+            public void run() {
+
+                final List<RssFeed> resultFeeds = new ArrayList<RssFeed>();
+                Cursor cursor = RssFeedTable.fetchAllFeeds(databaseOpenHelper.getReadableDatabase());
+
+                if (cursor.moveToFirst()) {
+                    do {
+                        resultFeeds.add(feedFromCursor(cursor));
+                    } while (cursor.moveToNext());
+                    cursor.close();
+                }
+
+                callbackThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onSuccess(resultFeeds);
+                    }
+                });
+            }
+        });
+    }
+
     public void fetchNewItemsForFeed(final RssFeed rssFeed, final Callback<List<RssItem>> callback) {
 
         final Handler callbackThreadHandler = new Handler();
 
         submitTask(new Runnable() {
-
             @Override
             public void run() {
+
                 GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(rssFeed.getFeedUrl());
                 final List<RssItem> newItems = new ArrayList<RssItem>();
+
                 List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
 
                 if (checkForError(getFeedsNetworkRequest, callbackThreadHandler, callback)) {
@@ -98,7 +159,6 @@ public class DataSource {
                     }
 
                     long newItemRowId = insertResponseToDatabase(rssFeed.getRowId(), itemResponse);
-
                     Cursor newItemCursor = rssItemTable.fetchRow(databaseOpenHelper.getReadableDatabase(), newItemRowId);
                     newItemCursor.moveToFirst();
                     newItems.add(itemFromCursor(newItemCursor));
@@ -146,7 +206,7 @@ public class DataSource {
                 GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
                 List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
 
-                if(checkForError(getFeedsNetworkRequest, callbackThreadHandler, callback)) {
+                if (checkForError(getFeedsNetworkRequest, callbackThreadHandler, callback)) {
                     return;
                 }
 
@@ -178,23 +238,23 @@ public class DataSource {
         });
     }
 
-    public void fetchFeedWithId(final long rowId, final Callback<RssFeed> callback) {
+    public void fetchRSSItemWithId(final long rowId, final Callback<RssItem> callback) {
 
         final Handler callbackThreadHandler = new Handler();
 
         submitTask(new Runnable() {
             @Override
             public void run() {
+                Cursor cursor = rssItemTable.fetchRow(databaseOpenHelper.getReadableDatabase(), rowId);
 
-                Cursor cursor = rssFeedTable.fetchRow(databaseOpenHelper.getReadableDatabase(), rowId);
+                if(cursor.moveToFirst()) {
 
-                if (cursor.moveToFirst()) {
-                    final RssFeed rssFeed = feedFromCursor(cursor);
+                    final RssItem rssItem = itemFromCursor(cursor);
                     cursor.close();
                     callbackThreadHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onSuccess(rssFeed);
+                            callback.onSuccess(rssItem);
                         }
                     });
                 }
@@ -202,43 +262,13 @@ public class DataSource {
                     callbackThreadHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onError("RSS feed not found for row Id (" + rowId + ")");
+                            callback.onError("Rss item not found for row Id (" + rowId + ")");
                         }
                     });
                 }
             }
         });
-    }
 
-    public void fetchAllFeeds(final Callback<List<RssFeed>> callback) {
-
-        final Handler callbackThreadHandler = new Handler();
-
-        submitTask(new Runnable() {
-            @Override
-            public void run() {
-
-                final List<RssFeed> resultFeeds = new ArrayList<RssFeed>();
-
-                Cursor cursor = RssFeedTable.fetchAllFeeds(databaseOpenHelper.getReadableDatabase());
-
-                if (cursor.moveToFirst()) {
-                    do {
-                        resultFeeds.add(feedFromCursor(cursor));
-                    }
-                    while (cursor.moveToNext());
-
-                    cursor.close();
-                }
-
-                callbackThreadHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onSuccess(resultFeeds);
-                    }
-                });
-            }
-        });
     }
 
     public void fetchItemsForFeed(final RssFeed rssFeed, final Callback<List<RssItem>> callback) {
@@ -299,6 +329,7 @@ public class DataSource {
     }
 
     boolean checkForError(GetFeedsNetworkRequest getFeedsNetworkRequest, Handler callbackThreadHandler, final Callback<?> callback) {
+
         if (getFeedsNetworkRequest.getErrorCode() != 0) {
 
             final String errorMessage;
@@ -323,10 +354,12 @@ public class DataSource {
                 }
             });
         }
+
         return getFeedsNetworkRequest.getErrorCode() != 0;
     }
 
     long insertResponseToDatabase(long feedId, GetFeedsNetworkRequest.ItemResponse itemResponse) {
+
         long itemPubDate = System.currentTimeMillis();
 
         DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
