@@ -67,6 +67,8 @@ public class RobotoTextView extends TextView {
 
         // Gets the index of the font values we assigned to the enumerated xml file from earlier
 
+        boolean condensed = typedArray.getBoolean(R.styleable.Roboto_robotoFontCond, false);
+
         int robotoFontIndex = typedArray.getInteger(R.styleable.Roboto_robotoFont, -1);
 
         // Mandatory method after executing the obtainStyledAttributes method
@@ -78,12 +80,13 @@ public class RobotoTextView extends TextView {
         // file that starts from with resource tags by using getResources()!!
         // Then retrieve the array of strings
 
-        String[] stringArray = getResources().getStringArray(R.array.roboto_font_file_names);
+        String[] stringArray;
 
-        // If array is out of index, just stop the darn thing!
-
-        if (robotoFontIndex < 0 || robotoFontIndex >= stringArray.length) {
-            return;
+        if(condensed) {
+            stringArray = getResources().getStringArray(R.array.roboto_font_file_names_condensed);
+        }
+        else {
+            stringArray = getResources().getStringArray(R.array.roboto_font_file_names_regular);
         }
 
         // All of the mapping between arrays.xml and attrs.xml are all done. Now associate the

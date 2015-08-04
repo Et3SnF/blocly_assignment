@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="roboto_font_file_names">
+    <string-array name="roboto_font_file_names_regular">
         <item>Roboto-Black.ttf</item>
         <item>Roboto-BlackItalic.ttf</item>
         <item>Roboto-Bold.ttf</item>
@@ -13,6 +13,9 @@
         <item>Roboto-Regular.ttf</item>
         <item>Roboto-Thin.ttf</item>
         <item>Roboto-ThinItalic.ttf</item>
+    </string-array>
+
+    <string-array name = "roboto_font_file_names_condensed">
         <item>RobotoCondensed-Bold.ttf</item>
         <item>RobotoCondensed-BoldItalic.ttf</item>
         <item>RobotoCondensed-Italic.ttf</item>
@@ -20,4 +23,5 @@
         <item>RobotoCondensed-LightItalic.ttf</item>
         <item>RobotoCondensed-Regular.ttf</item>
     </string-array>
+
 </resources>
