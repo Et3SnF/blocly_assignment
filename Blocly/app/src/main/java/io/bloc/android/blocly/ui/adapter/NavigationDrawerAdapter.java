@@ -5,7 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.lang.ref.WeakReference;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -19,6 +20,36 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         NAVIGATION_OPTION_INBOX,
         NAVIGATION_OPTION_FAVORITES,
         NAVIGATION_OPTION_ARCHIVED
+    }
+
+    // Interfaces to delegate to another class
+
+    public static interface NavigationDrawerAdapterDelegate {
+
+        public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationOption navigationOption);
+        public void didSelectFeed(NavigationDrawerAdapter navigationDrawerAdapter, RssFeed rssFeed);
+
+    }
+
+    // Store the delegate. Allows the use of an object as long as strong reference to it exists
+    // somewhere
+
+    WeakReference<NavigationDrawerAdapterDelegate> delegate;
+
+    // Setters and getters for delegates
+
+    public void setDelegate(NavigationDrawerAdapterDelegate delegate) {
+        this.delegate = new WeakReference<NavigationDrawerAdapterDelegate>(delegate);
+    }
+
+    public NavigationDrawerAdapterDelegate getDelegate() {
+
+        if(delegate == null) {
+            return null;
+        }
+
+        return delegate.get();
+
     }
 
     @Override
@@ -54,6 +85,11 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         View bottomPadding;
         View divider;
 
+        // Variables for delegation
+
+        int position;
+        RssFeed rssFeed;
+
         public ViewHolder(final View itemView) {
             super(itemView);
 
@@ -70,7 +106,21 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "Nothing yet...", Toast.LENGTH_SHORT).show();
+
+                    if(getDelegate() == null) {
+                        return;
+                    }
+
+                    if(position < NavigationOption.values().length) {
+
+                        getDelegate().didSelectNavigationOption(NavigationDrawerAdapter.this,
+                                NavigationOption.values()[position]);
+
+                    }
+                    else {
+                        getDelegate().didSelectFeed(NavigationDrawerAdapter.this, rssFeed);
+                    }
+
                 }
 
             });
@@ -79,6 +129,11 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         // Update method
 
         void update(int position, RssFeed rssFeed) {
+
+            // Constantly update these two fields
+
+            this.position = position;
+            this.rssFeed = rssFeed;
 
             // To show top padding or not...
 
