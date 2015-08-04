@@ -19,9 +19,9 @@ public abstract class Table {
 
     }
 
-    public Cursor fetchRow(SQLiteDatabase readOnlyDatabase, long rowId) {
+    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId) {
 
-        return readOnlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
                 new String[] {String.valueOf(rowId)}, null, null, null, null);
 
     }

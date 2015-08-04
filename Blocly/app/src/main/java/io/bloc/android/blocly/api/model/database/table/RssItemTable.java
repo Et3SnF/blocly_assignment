@@ -91,7 +91,7 @@ public class RssItemTable extends Table {
     public static boolean getArchived(Cursor cursor) {
         return getBoolean(cursor, COLUMN_ARCHIVED);
     }
-    
+
     private static final String NAME = "rss_items";
     private static final String COLUMN_LINK = "link";
     private static final String COLUMN_TITLE = "title";
@@ -104,6 +104,52 @@ public class RssItemTable extends Table {
     private static final String COLUMN_FAVORITE = "is_favorite";
     private static final String COLUMN_ARCHIVED = "is_archived";
 
+
+    // Query Methods
+
+    public Cursor fetchAllArchived(SQLiteDatabase readOnlyDatabase, long rowId) {
+
+        return readOnlyDatabase.query(true, getName(), null, COLUMN_ARCHIVED + " = 1, " + COLUMN_ID + " = ?",
+                new String[]{String.valueOf(rowId)}, null, null, null, null);
+
+    }
+
+    public Cursor fetchArchived(SQLiteDatabase readOnlyDatabase, long rowId) {
+
+        return readOnlyDatabase.query(true, getName(), null, COLUMN_ARCHIVED + " = 1, " + COLUMN_ID + "=" + rowId,
+                new String[]{String.valueOf(rowId)}, null, null, null, null);
+
+    }
+
+    public Cursor fetchAllFavorited(SQLiteDatabase readOnlyDatabase, long rowId) {
+
+        return readOnlyDatabase.query(true, getName(), null, COLUMN_FAVORITE + " = 1, " + COLUMN_ID + " = ?",
+                new String[] {String.valueOf(rowId)}, null, null, null, null);
+
+    }
+
+    public Cursor fetchFavorited(SQLiteDatabase readOnlyDatabase, long rowId) {
+
+        return readOnlyDatabase.query(true, getName(), null, COLUMN_FAVORITE + " = 1, " + COLUMN_ID + "=" + rowId,
+                new String[] {String.valueOf(rowId)}, null, null, null, null);
+
+    }
+
+    public Cursor fetchAllItems(SQLiteDatabase readOnlyDatabase, long rowId) {
+
+        return readOnlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+                new String[] {String.valueOf(rowId)}, null, null, null, null);
+
+    }
+
+    public Cursor fetchItems(SQLiteDatabase readOnlyDatabase, long rowId, long limit, long offset) {
+
+        return readOnlyDatabase.query(true, getName(), null, COLUMN_ID + "=" + rowId,
+                new String[] {String.valueOf(rowId)}, null, null, null,
+                "LIMIT " + String.valueOf(limit) + " OFFSET " + String.valueOf(offset));
+
+    }
+
     @Override
     public String getName() {
         return "rss_items";
@@ -112,7 +158,7 @@ public class RssItemTable extends Table {
     @Override
     public String getCreateStatement() {
         return "CREATE TABLE " + getName() + " ("
-                + COLUMN_ID + " INTEGER PRIMARY KEY"
+                + COLUMN_ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_LINK + " TEXT,"
                 + COLUMN_TITLE + " TEXT,"
                 + COLUMN_DESCRIPTION + " TEXT,"
