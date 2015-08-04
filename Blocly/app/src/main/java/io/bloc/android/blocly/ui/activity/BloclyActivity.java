@@ -10,6 +10,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
@@ -18,7 +20,7 @@ import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 // ActionBarActivity is required to use when I have Theme.AppCompat in the styles.xml
 // This has backwards compatible features
 
-public class BloclyActivity extends ActionBarActivity {
+public class BloclyActivity extends ActionBarActivity implements View.OnClickListener {
 
     private ItemAdapter itemAdapter;
 
@@ -101,5 +103,10 @@ public class BloclyActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(v.getContext(), "Nothing here yet....", Toast.LENGTH_SHORT).show();
     }
 }
