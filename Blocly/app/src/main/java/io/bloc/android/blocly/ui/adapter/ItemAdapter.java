@@ -24,6 +24,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
     // For logcat
 
     private static String TAG = ItemAdapter.class.getSimpleName();
+    private static Throwable tr;
 
     @Override
     public ItemAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int index) {
@@ -101,6 +102,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
 
             Log.e(TAG, "onLoadingFailed: " + failReason.toString() + " for URL: " + imageUri);
+            Log.getStackTraceString(tr.fillInStackTrace());
 
         }
 
