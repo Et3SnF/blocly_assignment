@@ -1,5 +1,6 @@
 package io.bloc.android.blocly.ui.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -136,6 +137,8 @@ public class BloclyActivity extends ActionBarActivity implements
                     menu.getItem(i).setEnabled(false);
                 }
 
+                // Set the share alpha to 0 and disable it for now
+
             }
 
             // The opacity of the menu items will be changed as the drawer is slid out
@@ -179,6 +182,8 @@ public class BloclyActivity extends ActionBarActivity implements
 
 
             }
+
+
         };
 
         // Put in that "menu switch" and place a listener in it
@@ -212,6 +217,13 @@ public class BloclyActivity extends ActionBarActivity implements
 
         getMenuInflater().inflate(R.menu.blocly, menu);
         this.menu = menu;
+
+        // Set the visibility and functionality of the menu button to false
+        // Make it show whenever a feed item is clicked
+
+        menu.getItem(0).setEnabled(false);
+        menu.getItem(0).setVisible(false);
+
         return super.onCreateOptionsMenu(menu);
 
     }
@@ -241,6 +253,16 @@ public class BloclyActivity extends ActionBarActivity implements
         // Create a toast whenever a menu item is pressed
 
         Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+
+        if(item.getTitle().equals("Share")) {
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "Take a look at this feed!");
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
+
+        }
 
         return super.onOptionsItemSelected(item);
 
@@ -317,9 +339,13 @@ public class BloclyActivity extends ActionBarActivity implements
         if (itemAdapter.getExpandedItem() != rssItem) {
             positionToExpand = BloclyApplication.getSharedDataSource().getItems().indexOf(rssItem);
             itemAdapter.setExpandedItem(rssItem);
+            menu.getItem(0).setEnabled(true);
+            menu.getItem(0).setVisible(true);
         }
         else {
             itemAdapter.setExpandedItem(null);
+            menu.getItem(0).setEnabled(false);
+            menu.getItem(0).setVisible(false);
         }
 
         // Notify for changes --> goes to ItemAdapter's update(RssFeed, RssItem) method
