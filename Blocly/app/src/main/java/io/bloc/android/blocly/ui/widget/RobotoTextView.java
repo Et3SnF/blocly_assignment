@@ -28,7 +28,6 @@ public class RobotoTextView extends TextView {
         super(context);
     }
 
-    // #4
     public RobotoTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         extractFont(attrs);
@@ -107,4 +106,5 @@ public class RobotoTextView extends TextView {
 
         setTypeface(robotoTypeface);
     }
+
 }

@@ -83,7 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_rss_item_title"
         android:layout_marginTop="8dp"
-        android:text = "New York Times"
+        android:text = "@string/placeholder_headline"
         android:layout_marginRight="8dp"
         android:layout_toLeftOf="@+id/cb_rss_item_check_mark"/>
 
@@ -93,11 +93,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below = "@+id/tv_rss_item_feed_title"
-        android:text = "A giant squid appeared abruptly today in lower Manhattan. The squid appeared
-        peaceful at first but violence quickly escalated after a tourist attempted to have a photo
-        with a giant octopus..."
+        android:text = "@string/placeholder_content"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
-        android:layout_toLeftOf="@+id/cb_rss_item_favorite_star"/>
+        android:layout_toLeftOf="@+id/cb_rss_item_favorite_star"
+        android:lines ="3"
+        android:ellipsize="end"/>
+
+    <!-- The lines android:lines = "3" and ellipsize = "end"
+     are intended to be there for the "compact view" of stuff. We will
+     integrate the stuff below to give the ability to expand the information"
+     -->
+
+    <!-- The hidden elements are tucked inside this LinearLayout which
+    will be used to actually display the rest of the material along with
+    the link that was provided
+
+    Short preview text is visible by default and hidden linearLayout is gone
+    initially until it is expanded
+
+    What is inside this hidden LinearLayout. The full content and the
+    VISIT SITE link
+
+    -->
+
+    <LinearLayout
+        android:id="@+id/ll_rss_item_expanded_content_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_below="@id/tv_rss_item_feed_title"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/cb_rss_item_check_mark"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <io.bloc.android.blocly.ui.widget.RobotoTextView
+            style = "@style/Body1"
+            android:id="@+id/tv_rss_item_content_full"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <io.bloc.android.blocly.ui.widget.RobotoTextView
+            style = "@style/Button"
+            android:id="@+id/tv_rss_item_visit_site"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text = "@string/visit_site"
+            android:layout_marginTop="8dp"
+            android:paddingTop="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="8dp"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

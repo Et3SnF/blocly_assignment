@@ -69,26 +69,44 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         RssItem rssItem;
 
+        // Boolean variable to either allow expanded view or not
+
+        boolean contentExpanded;
+
+        // Variables for the expanded content
+
+        View expandedContentWrapper;
+        TextView expandedContent;
+        TextView visitSite;
+
+        // Constructor
+
         public ItemAdapterViewHolder(View itemView) {
             super(itemView);
 
-            // Variables for TextView
+            // Declare TextView variables to layout
 
             title = (TextView) itemView.findViewById(R.id.tv_rss_item_title);
             feed = (TextView) itemView.findViewById(R.id.tv_rss_item_feed_title);
             content = (TextView) itemView.findViewById(R.id.tv_rss_item_content);
 
-            // Variables for Image Library
+            // Declare Image Library variables to layout
 
             headerWrapper = itemView.findViewById(R.id.fl_rss_item_image_header);
             headerImage = (ImageView) headerWrapper.findViewById(R.id.iv_rss_item_image);
 
-            // Variables for checkboxes
+            // Declare expanded content variables to layout
+
+            expandedContentWrapper = itemView.findViewById(R.id.ll_rss_item_expanded_content_wrapper);
+            expandedContent = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_content_full);
+            visitSite = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_visit_site);
+
+            // Declare CheckBox variables to layout
 
             archiveCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_check_mark);
             favoriteCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_favorite_star);
 
-            // Activate clickListener for ViewHolder
+            // Activate clickListener for whole ViewHolder
 
             itemView.setOnClickListener(this);
 
@@ -96,6 +114,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
             archiveCheckbox.setOnCheckedChangeListener(this);
             favoriteCheckbox.setOnCheckedChangeListener(this);
+
+            // Activate listener for Visit Site link
+
+            visitSite.setOnClickListener(this);
 
         }
 
@@ -107,7 +129,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
             feed.setText(rssFeed.getTitle());
             title.setText(rssItem.getTitle());
+
+                // This is the content when previewed (restricted to 3 lines)
+
             content.setText(rssItem.getDescription());
+
+                // This is when the content when expanded
+
+            expandedContent.setText(rssItem.getDescription());
 
             // Update image view
 
@@ -159,7 +188,23 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         @Override
         public void onClick(View view) {
 
-            Toast.makeText(view.getContext(), rssItem.getTitle(), Toast.LENGTH_SHORT).show();
+            if (view == itemView) {
+
+                // itemView came from RecyclerView.java file!
+
+                // if contentExpanded is true, make it visible, otherwise, just don't show full content
+                contentExpanded = !contentExpanded;
+                expandedContentWrapper.setVisibility(contentExpanded ? View.VISIBLE : View.GONE);
+
+                // if contentExpanded is true, make it visible, otherwise, just don't show full content
+
+                expandedContentWrapper.setVisibility(contentExpanded ? View.VISIBLE : View.GONE);
+
+                content.setVisibility(contentExpanded ? View.GONE : View.VISIBLE);
+            }
+            else {
+                Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
+            }
 
         }
 

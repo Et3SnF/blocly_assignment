@@ -9,7 +9,7 @@
 
     </style>
 
-    <!-- Style for robotofont -->
+    <!-- Style for roboto font -->
 
     <style name="Headline">
 
@@ -35,6 +35,17 @@
         <item name="android:textColor">@color/white_87</item>
         <item name="android:textSize">14sp</item>
         <item name="robotoFont">Regular</item>
+
+    </style>
+
+    <!-- Style for VISIT SITE link -->
+
+    <style name = "Button">
+
+        <item name = "android:textColor">@drawable/btn_text_drawable</item>
+        <item name = "android:textSize">14sp</item>
+        <item name = "android:textAllCaps">true</item>
+        <item name = "robotoFont">Medium</item>
 
     </style>
 
