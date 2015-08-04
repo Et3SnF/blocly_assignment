@@ -2,10 +2,29 @@
 
     <!-- Base application theme. -->
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
 
         <!-- Window Background -->
-        <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:windowBackground">@color/background_color</item>
+
+        <!-- Drawer Arrow Style - Colors for ActionBar Items -->
+
+        <item name = "drawerArrowStyle">@style/DrawerArrow</item>
+
+        <!-- AppCompat Colors -->
+
+        <item name ="colorPrimary">@color/action_bar_color</item>
+        <item name ="colorPrimaryDark">@color/status_bar_color</item>
+        <item name ="colorAccent">@color/accent</item>
+
+    </style>
+
+    <!-- Style for Drawer Arrow Toggle -->
+    <!-- The parent provides supplies color, thickness, barSize, and gapBetweenBars-->
+
+    <style name = "DrawerArrow" parent = "Base.Widget.AppCompat.DrawerArrowToggle">
+
+        <item name ="color">@color/white_87</item>
 
     </style>
 

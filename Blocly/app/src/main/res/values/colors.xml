@@ -30,4 +30,6 @@
     <color name ="blue_50">#800000FF</color>
     <color name ="green_50">#8000FF00</color>
 
+    <color name ="drawer_color">#E5111111</color>
+
 </resources>
