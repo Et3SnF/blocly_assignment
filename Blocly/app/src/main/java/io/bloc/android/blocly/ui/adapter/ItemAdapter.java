@@ -47,7 +47,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         return BloclyApplication.getSharedDataSource().getItems().size();
     }
 
-    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener {
 
         // --- Member variables for the view holder --- //
 
@@ -74,6 +74,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         // Boolean variable to either allow expanded view or not
 
         boolean contentExpanded;
+        boolean imageExpanded;
 
         // Variables for the expanded content
 
@@ -84,6 +85,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         // Constructor
 
         public ItemAdapterViewHolder(View itemView) {
+
             super(itemView);
 
             // Declare TextView variables to layout
@@ -114,12 +116,59 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
             // Activate Listeners for checkboxes
 
-            archiveCheckbox.setOnCheckedChangeListener(this);
-            favoriteCheckbox.setOnCheckedChangeListener(this);
+            archiveCheckbox.setOnCheckedChangeListener(
+
+                    new CompoundButton.OnCheckedChangeListener() {
+
+                        // -- OnCheckChangedListener Methods -- //
+
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            Log.v(TAG, "Checked changed to: " + isChecked);
+                        }
+                    }
+            );
+
+            favoriteCheckbox.setOnCheckedChangeListener(
+
+                    new CompoundButton.OnCheckedChangeListener() {
+
+                        // -- OnCheckChangedListener Methods -- //
+
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            Log.v(TAG, "Star changed to: " + isChecked);
+                        }
+                    }
+
+            );
 
             // Activate listener for Visit Site link
 
-            visitSite.setOnClickListener(this);
+            visitSite.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
+                }
+
+            });
+
+            // ImageView listener
+
+            headerImage.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    animateImage(!imageExpanded);
+
+                    if(!imageExpanded) {
+                        animateImage(imageExpanded);
+                    }
+
+                }
+
+            });
 
         }
 
@@ -143,8 +192,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             // Update image view
 
             if (rssItem.getImageUrl() != null) {
-                headerWrapper.setVisibility(View.VISIBLE);
-                headerImage.setVisibility(View.INVISIBLE);
+                animateImage(imageExpanded);
                 ImageLoader.getInstance().loadImage(rssItem.getImageUrl(), this);
             }
             else {
@@ -195,7 +243,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 // itemView came from RecyclerView.java file!
 
                 animateContent(!contentExpanded);
-
             }
             else {
                 Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
@@ -203,14 +250,91 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         }
 
-        // -- OnCheckChangedListener Methods -- //
+        // --- Animating Image! --- //
 
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Log.v(TAG, "Checked changed to: " + isChecked);
+        private void animateImage(final boolean expand) {
+
+            // If it's already in its desired state, just run this if-statement
+
+            if ((expand && imageExpanded) || (!expand && !imageExpanded)) {
+                return;
+            }
+
+            // This area beyond this point is when we need to animate stuff
+
+            int startingHeight = headerWrapper.getMeasuredHeight();
+            int finalHeight = headerImage.getMeasuredHeight();
+
+            if (expand) {
+
+                startingHeight = finalHeight;
+
+                // Set the transparency and the visibility of the wrapper (View class)
+
+                headerWrapper.setAlpha(0f);
+                headerWrapper.setVisibility(View.VISIBLE);
+
+                // Use the measure method to ask view to measure itself (the width of content)
+
+                headerWrapper.measure(View.MeasureSpec.makeMeasureSpec(headerImage.getWidth(),
+                        View.MeasureSpec.EXACTLY), ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                // This height is actually unlimited
+
+                finalHeight = headerWrapper.getMeasuredHeight();
+            }
+            else {
+                headerImage.setVisibility(View.VISIBLE);
+            }
+
+            // Animation progress is a floating point - between 0.0 to 1.0 where 0.5 means halfway through
+            // THis is also used to set the opacity to give it a transition
+
+            //important method overall to get this animation going
+
+            startAnimator(startingHeight, finalHeight, new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+
+                    float animatedFraction = animation.getAnimatedFraction();
+                    float wrapperAlpha = expand ? animatedFraction : 1f - animatedFraction;
+                    float contentAlpha = 1f - wrapperAlpha;
+
+                    // Set the opacity of the wrapper and content (causes a cross-fade)
+
+                    headerWrapper.setAlpha(wrapperAlpha);
+                    headerImage.setAlpha(contentAlpha);
+
+                    // We get teh layout parameters, and set the height directly in code.
+                    // If it equals to 1.0, set the parameters to "wrap_content". If not,
+                    // get the animated value
+
+                    headerWrapper.getLayoutParams().height = animatedFraction == 1f ?
+                            ViewGroup.LayoutParams.WRAP_CONTENT : (Integer) animation.getAnimatedValue();
+
+                    // This method asks itself to redraw itself on the screen
+
+                    headerWrapper.requestLayout();
+
+                    if (animatedFraction == 1f) {
+                        if (expand) {
+                            headerImage.setVisibility(View.GONE);
+                        }
+                        else {
+                            headerWrapper.setVisibility(View.GONE);
+                        }
+                    }
+
+                }
+            });
+
+            imageExpanded = expand;
+
         }
 
-        // --- Animate Content --- //
+
+        // --- Animating Content! --- //
 
         private void animateContent(final boolean expand) {
 
@@ -242,7 +366,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 // This height is actually unlimited
 
                 finalHeight = expandedContentWrapper.getMeasuredHeight();
-            } else {
+            }
+            else {
                 content.setVisibility(View.VISIBLE);
             }
 
@@ -277,11 +402,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                     expandedContentWrapper.requestLayout();
 
                     if (animatedFraction == 1f) {
+
                         if (expand) {
                             content.setVisibility(View.GONE);
-                        } else {
+                        }
+                        else {
                             expandedContentWrapper.setVisibility(View.GONE);
                         }
+
                     }
 
                 }
