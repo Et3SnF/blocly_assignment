@@ -17,15 +17,19 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
+import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
 // ActionBarActivity is required to use when I have Theme.AppCompat in the styles.xml
 // This has backwards compatible features
 
-public class BloclyActivity extends ActionBarActivity implements NavigationDrawerAdapter.NavigationDrawerAdapterDelegate {
+public class BloclyActivity extends ActionBarActivity implements
+        NavigationDrawerAdapter.NavigationDrawerAdapterDelegate, ItemAdapter.DataSource,
+        ItemAdapter.Delegate {
 
     private ItemAdapter itemAdapter;
 
@@ -192,6 +196,11 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
 
         navigationDrawerAdapter.setDelegate(this);
 
+        // Set the delegate
+
+        itemAdapter.setDataSource(this);
+        itemAdapter.setDelegate(this);
+
     }
 
     // When Options menu is created, inflate the blocly menu layout
@@ -254,4 +263,58 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
         Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     *
+     * DataSource method implementation
+     *
+     */
+
+    @Override
+    public int getItemCount(ItemAdapter itemAdapter) {
+        return BloclyApplication.getSharedDataSource().getItems().size();
+    }
+
+    @Override
+    public RssItem getRssItem(ItemAdapter itemAdapter, int position) {
+        return BloclyApplication.getSharedDataSource().getItems().get(position);
+    }
+
+    @Override
+    public RssFeed getRssFeed(ItemAdapter itemAdapter, int position) {
+        return BloclyApplication.getSharedDataSource().getFeeds().get(0);
+    }
+
+    /**
+     *
+     * Delegate method implementation
+     *
+     */
+
+    @Override
+    public void onItemClicked(ItemAdapter itemAdapter, RssItem rssItem) {
+
+        int positionToExpand = -1;
+        int positionToContract = -1;
+
+        if (itemAdapter.getExpandedItem() != null) {
+            positionToContract = BloclyApplication.getSharedDataSource().getItems().indexOf(itemAdapter.getExpandedItem());
+        }
+
+        if (itemAdapter.getExpandedItem() != rssItem) {
+            positionToExpand = BloclyApplication.getSharedDataSource().getItems().indexOf(rssItem);
+            itemAdapter.setExpandedItem(rssItem);
+        }
+        else {
+            itemAdapter.setExpandedItem(null);
+        }
+
+        if (positionToContract > -1) {
+            itemAdapter.notifyItemChanged(positionToContract);
+        }
+
+        if (positionToExpand > -1) {
+            itemAdapter.notifyItemChanged(positionToExpand);
+        }
+
+    }
 }
