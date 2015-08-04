@@ -19,6 +19,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkRequest.FeedResponse>> {
 
+    public static final int ERROR_PARSING = 3;
+
     private static final String XML_TAG_TITLE = "title";
     private static final String XML_TAG_DESCRIPTION = "description";
     private static final String XML_TAG_LINK = "link";
@@ -29,22 +31,22 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_ATTRIBUTE_URL = "url";
     private static final String XML_ATTRIBUTE_TYPE = "type";
 
-    String[] feedsUrls;
+    String[] feedUrls;
 
-    public GetFeedsNetworkRequest(String... feedsUrls) {
-        this.feedsUrls = feedsUrls;
+    public GetFeedsNetworkRequest(String... feedUrls) {
+        this.feedUrls = feedUrls;
     }
 
     @Override
     public List<FeedResponse> performRequest() {
 
-        List<FeedResponse> responseFeeds = new ArrayList<FeedResponse>(feedsUrls.length);
+        List<FeedResponse> responseFeeds = new ArrayList<FeedResponse>(feedUrls.length);
 
-        for(String feedUrlString : feedsUrls) {
+        for (String feedUrlString : feedUrls) {
 
             InputStream inputStream = openStream(feedUrlString);
 
-            if(inputStream == null) {
+            if (inputStream == null) {
                 return null;
             }
 
@@ -60,9 +62,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 NodeList allItemNodes = xmlDocument.getElementsByTagName(XML_TAG_ITEM);
                 List<ItemResponse> responseItems = new ArrayList<ItemResponse>(allItemNodes.getLength());
 
-                for(int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
-
-                    // Anything not included, put null in the parameter areas if necessary
+                for (int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
 
                     String itemURL = null;
                     String itemTitle = null;
@@ -75,47 +75,43 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     Node itemNode = allItemNodes.item(itemIndex);
                     NodeList tagNodes = itemNode.getChildNodes();
 
-                    for(int tagIndex = 0; tagIndex < tagNodes.getLength(); tagIndex++) {
-
+                    for (int tagIndex = 0; tagIndex < tagNodes.getLength(); tagIndex++) {
                         Node tagNode = tagNodes.item(tagIndex);
                         String tag = tagNode.getNodeName();
 
-                        if(XML_TAG_LINK.equalsIgnoreCase(tag)) {
+                        if (XML_TAG_LINK.equalsIgnoreCase(tag)) {
                             itemURL = tagNode.getTextContent();
                         }
-                        else if(XML_TAG_TITLE.equalsIgnoreCase(tag)) {
+                        else if (XML_TAG_TITLE.equalsIgnoreCase(tag)) {
                             itemTitle = tagNode.getTextContent();
                         }
-                        else if(XML_TAG_DESCRIPTION.equalsIgnoreCase(tag)) {
+                        else if (XML_TAG_DESCRIPTION.equalsIgnoreCase(tag)) {
                             itemDescription = tagNode.getTextContent();
                         }
-                        else if(XML_TAG_ENCLOSURE.equalsIgnoreCase(tag)) {
-
-                            // because the enclosure tag ends with /> and has two items in it, we need to do something about it
+                        else if (XML_TAG_ENCLOSURE.equalsIgnoreCase(tag)) {
                             NamedNodeMap enclosureAttributes = tagNode.getAttributes();
                             itemEnclosureURL = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
                             itemEnclosureMIMEType = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
-
                         }
-                        else if(XML_TAG_PUB_DATE.equalsIgnoreCase(tag)) {
+                        else if (XML_TAG_PUB_DATE.equalsIgnoreCase(tag)) {
                             itemPubDate = tagNode.getTextContent();
                         }
-                        else if(XML_TAG_GUID.equalsIgnoreCase(tag)) {
+                        else if (XML_TAG_GUID.equalsIgnoreCase(tag)) {
                             itemGUID = tagNode.getTextContent();
                         }
                     }
 
                     responseItems.add(new ItemResponse(itemURL, itemTitle, itemDescription,
                             itemGUID, itemPubDate, itemEnclosureURL, itemEnclosureMIMEType));
-
                 }
 
                 // responseItems is a list!
 
                 responseFeeds.add(new FeedResponse(feedUrlString, channelTitle, channelURL, channelDescription, responseItems));
                 inputStream.close();
+
             }
-            catch(IOException e) {
+            catch (IOException e) {
                 e.printStackTrace();
                 setErrorCode(ERROR_IO);
                 return null;
@@ -130,30 +126,24 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 setErrorCode(ERROR_PARSING);
                 return null;
             }
-
         }
 
         return responseFeeds;
-
     }
 
     private String optFirstTagFromDocument(Document document, String tagName) {
-
         NodeList elementsByTagName = document.getElementsByTagName(tagName);
 
-        if(elementsByTagName.getLength() > 0) {
+        if (elementsByTagName.getLength() > 0) {
             return elementsByTagName.item(0).getTextContent();
         }
 
         return null;
-
     }
 
     // Class for reading the feed. Feed first, then items
 
     public static class FeedResponse {
-
-        // Member variables for feed stuff
 
         public final String channelFeedURL;
         public final String channelTitle;
@@ -161,13 +151,12 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         public final String channelDescription;
         public final List<ItemResponse> channelItems;
 
-        // Constructor
-
-        public FeedResponse(String channelDescription, String channelFeedURL, String channelTitle, String channelURL, List<ItemResponse> channelItems) {
-            this.channelDescription = channelDescription;
+        FeedResponse(String channelFeedURL, String channelTitle, String channelURL, String channelDescription,
+                     List<ItemResponse> channelItems) {
             this.channelFeedURL = channelFeedURL;
             this.channelTitle = channelTitle;
             this.channelURL = channelURL;
+            this.channelDescription = channelDescription;
             this.channelItems = channelItems;
         }
     }
@@ -175,8 +164,6 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     // Class for items objects
 
     public static class ItemResponse {
-
-        // Member variables. They are final so no need for setters or getters
 
         public final String itemURL;
         public final String itemTitle;
@@ -186,18 +173,15 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         public final String itemEnclosureURL;
         public final String itemEnclosureMIMEType;
 
-        // Constructor
-
-        public ItemResponse(String itemDescription, String itemURL, String itemTitle, String itemGUID, String itemPubDate, String itemEnclosureURL, String itemEnclosureMIMEType) {
-
-            this.itemDescription = itemDescription;
+        ItemResponse(String itemURL, String itemTitle, String itemDescription, String itemGUID,
+                     String itemPubDate, String itemEnclosureURL, String itemEnclosureMIMEType) {
             this.itemURL = itemURL;
             this.itemTitle = itemTitle;
+            this.itemDescription = itemDescription;
             this.itemGUID = itemGUID;
             this.itemPubDate = itemPubDate;
             this.itemEnclosureURL = itemEnclosureURL;
             this.itemEnclosureMIMEType = itemEnclosureMIMEType;
-
         }
     }
 

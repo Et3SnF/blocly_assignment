@@ -52,7 +52,7 @@ public class RssItemTable extends Table {
 
         @Override
         public long insert(SQLiteDatabase writableDB) {
-            return writableDB.insert(NAME, null, values);
+            return writableDB.insert(RssItemTable.NAME, null, values);
         }
     }
 
@@ -91,7 +91,12 @@ public class RssItemTable extends Table {
     public static boolean getArchived(Cursor cursor) {
         return getBoolean(cursor, COLUMN_ARCHIVED);
     }
-    
+
+    public static Cursor fetchItemsForFeed(SQLiteDatabase readOnlyDatabase, long feedRowId) {
+        return readOnlyDatabase.query(true, NAME, null, COLUMN_RSS_FEED + " = ?",
+                new String[] {String.valueOf(feedRowId)}, null, null, COLUMN_PUB_DATE + " DESC", null);
+    }
+
     private static final String NAME = "rss_items";
     private static final String COLUMN_LINK = "link";
     private static final String COLUMN_TITLE = "title";
@@ -112,7 +117,7 @@ public class RssItemTable extends Table {
     @Override
     public String getCreateStatement() {
         return "CREATE TABLE " + getName() + " ("
-                + COLUMN_ID + " INTEGER PRIMARY KEY"
+                + COLUMN_ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_LINK + " TEXT,"
                 + COLUMN_TITLE + " TEXT,"
                 + COLUMN_DESCRIPTION + " TEXT,"
