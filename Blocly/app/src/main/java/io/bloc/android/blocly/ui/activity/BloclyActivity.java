@@ -227,9 +227,20 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
             return true;
         }
 
-        // Create a toast whenever a menu item is pressed
+        // Create a toast with a specific message whenever a menu item is pressed
 
-        Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+        if((item.getTitle()).equals("Refresh")) {
+            Toast.makeText(this, "Refresh it up...", Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getTitle().equals("Search")) {
+            Toast.makeText(this, "Searching is fun!", Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getTitle().equals("Share")) {
+            Toast.makeText(this, "I love to share!", Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getTitle().equals("Mark all as read")) {
+            Toast.makeText(this, "Mark 'em all!", Toast.LENGTH_SHORT).show();
+        }
 
         return super.onOptionsItemSelected(item);
 
