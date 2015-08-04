@@ -24,7 +24,22 @@
 
     <style name = "DrawerArrow" parent = "Base.Widget.AppCompat.DrawerArrowToggle">
 
-        <item name ="color">@color/white_87</item>
+        <item name ="color">@color/red_50</item>
+        <item name ="thickness">1dp</item>
+
+        <!-- Triple bar adjustment -->
+
+        <item name ="barSize">20dp</item>
+        <item name ="gapBetweenBars">4dp</item>
+
+        <!-- Arrow adjustments -->
+
+        <item name ="topBottomBarArrowSize">15dp</item>
+        <item name ="middleBarArrowSize">0dp</item>
+
+        <!--Spin animation to go between menu to arrow or not -->
+
+        <item name = "spinBars">false</item>
 
     </style>
 

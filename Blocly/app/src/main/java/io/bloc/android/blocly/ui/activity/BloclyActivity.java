@@ -9,6 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 
 import io.bloc.android.blocly.R;
@@ -31,7 +32,7 @@ public class BloclyActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
 
-        // Add the toolbar support here
+        // Add the toolbar support here. Set toolbar as an action bar
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
@@ -52,6 +53,8 @@ public class BloclyActivity extends ActionBarActivity {
         // that viewholder in ItemAdapter.java. Whole different story
 
         // Instance of ActionBar to give space to make way of menu icon instead of the app's icon
+        // The boolean setDisplayHomeAsUpEnabled toggles whether we should display the menu icon or
+        // not
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
@@ -60,6 +63,11 @@ public class BloclyActivity extends ActionBarActivity {
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
+
+        // Default DrawerLayout to open at launch
+
+        drawerLayout.openDrawer(Gravity.LEFT);
+
     }
 
     // These methods are required when something in the Activity changes. The drawer needs to

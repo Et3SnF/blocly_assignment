@@ -8,6 +8,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- This linear layout is part of the app drawer. We put any view that's in this within the
+    drawer layout tags
+     -->
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -37,7 +41,7 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:text="@string/drawer_message"
-        android:textSize="32sp"
+        android:textSize="20sp"
         android:gravity="center"
         android:layout_gravity = "left"
         android:textColor="@color/white_87"
