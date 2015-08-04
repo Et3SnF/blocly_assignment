@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class GetFeedsNetworkRequest extends NetworkRequest {
 
@@ -30,10 +31,20 @@ public class GetFeedsNetworkRequest extends NetworkRequest {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line = bufferedReader.readLine();
 
+                ArrayList<String> test = new ArrayList<String>();
+                int lineNums = 0;
+
                 while(line != null) {
-                    Log.v(getClass().getSimpleName(), "Line: " + line);
+                    Log.v(getClass().getSimpleName(), "Line " + (lineNums+1) + ": " + line);
+                    test.add(line);
+                    lineNums++;
                     line = bufferedReader.readLine();
                 }
+
+                // Count number of items in feed. Split into array based on <item> tags
+
+                String[] items = test.get(1).split("<item>");
+                Log.v(getClass().getSimpleName(), "Number of items in feed: " + items.length);
 
                 bufferedReader.close();
             }
