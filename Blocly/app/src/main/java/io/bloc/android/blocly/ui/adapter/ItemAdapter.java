@@ -190,7 +190,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         // For Tablet
 
         TextView callout;
-
         RssItem rssItem;
 
         // Constructor
@@ -223,6 +222,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
                 // For Tablet View
                 onTablet = true;
+
                 callout = (TextView) itemView.findViewById(R.id.tv_rss_item_callout);
 
                 // Need this check to check API version otherwise a RunTimeException occurs

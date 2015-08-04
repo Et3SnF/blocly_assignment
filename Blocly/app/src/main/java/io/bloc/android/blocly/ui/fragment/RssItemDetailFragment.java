@@ -80,7 +80,7 @@ public class RssItemDetailFragment extends Fragment implements ImageLoadingListe
         return inflate;
     }
 
-     /*
+    /*
       * ImageLoadingListener
       */
 

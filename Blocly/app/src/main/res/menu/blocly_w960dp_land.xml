@@ -4,8 +4,7 @@
 
     <item
         android:id="@+id/action_visit_site"
-        android:icon="@style/Button"
-        android:text="@string/visit_site"
+        android:icon="@drawable/ic_visit_site_selector"
         android:title="@string/menu_visit_site"
         android:orderInCategory="0"
         app:showAsAction="ifRoom"/>
@@ -17,6 +16,7 @@
         android:orderInCategory="1"
         app:showAsAction="ifRoom"/>
 
+
     <item
         android:id="@+id/action_favorite"
         android:icon="@drawable/btn_star_checkbox"
@@ -25,18 +25,18 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_share"
-        android:icon="@drawable/ic_share_selector"
-        android:title="@string/menu_share"
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_selector"
+        android:title="@string/menu_search"
         android:orderInCategory="3"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_selector"
-        android:title="@string/menu_search"
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_share_selector"
+        android:title="@string/menu_share"
         android:orderInCategory="4"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_refresh"

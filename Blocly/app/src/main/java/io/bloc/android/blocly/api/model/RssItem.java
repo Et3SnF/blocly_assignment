@@ -1,5 +1,8 @@
 package io.bloc.android.blocly.api.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 public class RssItem extends Model {
 
     // Member variables
@@ -67,5 +70,47 @@ public class RssItem extends Model {
     public boolean isArchived() {
         return archived;
     }
+
+    // ---- Parcelable Area ---- //
+
+        // Store the variables into this method
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(guid);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(url);
+        dest.writeString(imageUrl);
+        dest.writeLong(rssFeedId);
+        dest.writeLong(datePublished);
+    }
+
+    // Retrieve the variables from this constructor
+
+    public RssItem(Parcel source) {
+        super(source);
+        guid = source.readString();
+        title = source.readString();
+        description = source.readString();
+        url = source.readString();
+        imageUrl = source.readString();
+        rssFeedId = source.readLong();
+        datePublished = source.readLong();
+    }
+
+    public static final Parcelable.Creator<RssItem> CREATOR = new Parcelable.Creator<RssItem>() {
+
+        @Override
+        public RssItem createFromParcel(Parcel source) {
+            return new RssItem(source);
+        }
+
+        @Override
+        public RssItem[] newArray(int size) {
+            return new RssItem[size];
+        }
+    };
 
 }

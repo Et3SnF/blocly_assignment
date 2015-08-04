@@ -35,7 +35,6 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         return rssItemListFragment;
     }
 
-
     public static interface Delegate {
         public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem);
         public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem);
@@ -47,9 +46,12 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
     private ItemAdapter itemAdapter;
 
     private RssFeed currentFeed;
-    private List<RssItem> currentItems = new ArrayList<RssItem>();
+    private ArrayList<RssItem> currentItems = new ArrayList<RssItem>();
 
     private WeakReference<Delegate> delegate;
+
+    private final String feed_state = "currentFeed_state";
+    private final String items_state = "currentItems_state";
 
     @Override
     public void onAttach(Activity activity) {
@@ -108,6 +110,12 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         View inflate = inflater.inflate(R.layout.fragment_rss_list, container, false);
         swipeRefreshLayout = (SwipeRefreshLayout) inflate.findViewById(R.id.srl_fragment_rss_list);
         recyclerView = (RecyclerView) inflate.findViewById(R.id.rv_fragment_rss_list);
+
+        if(savedInstanceState != null) {
+            currentFeed = savedInstanceState.getParcelable(feed_state);
+            currentItems = savedInstanceState.getParcelableArrayList(items_state);
+        }
+
         return inflate;
     }
 
@@ -151,6 +159,13 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(itemAdapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(feed_state, currentFeed);
+        outState.putParcelableArrayList(items_state, currentItems);
     }
 
     /**
