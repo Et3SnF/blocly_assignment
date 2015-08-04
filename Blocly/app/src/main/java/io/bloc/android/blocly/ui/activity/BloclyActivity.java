@@ -1,7 +1,10 @@
 package io.bloc.android.blocly.ui.activity;
 
+import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -104,6 +108,14 @@ public class BloclyActivity extends ActionBarActivity implements
                 for(int i = 0; i < menu.size(); i++) {
 
                     MenuItem item = menu.getItem(i);
+
+                    // For drawer not to interfere with the share icon behavior
+                    // After closing the drawer, do not enable share action if no items are expanded!
+
+                    if(item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null) {
+                        continue;
+                    }
+
                     item.setEnabled(true);
 
                     Drawable icon = item.getIcon();
@@ -169,6 +181,14 @@ public class BloclyActivity extends ActionBarActivity implements
                 for(int i = 0; i < menu.size(); i++) {
 
                     MenuItem item = menu.getItem(i);
+
+                    // Do not change the opacity of the share icon if it wasn't visible in the first
+                    // place!
+
+                    if(item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null) {
+                        continue;
+                    }
+
                     Drawable icon = item.getIcon();
 
                     if(icon != null) {
@@ -212,6 +232,7 @@ public class BloclyActivity extends ActionBarActivity implements
 
         getMenuInflater().inflate(R.menu.blocly, menu);
         this.menu = menu;
+        animateShareItem(itemAdapter.getExpandedItem() != null); //animate share icon when expanded
         return super.onCreateOptionsMenu(menu);
 
     }
@@ -238,9 +259,26 @@ public class BloclyActivity extends ActionBarActivity implements
             return true;
         }
 
-        // Create a toast whenever a menu item is pressed
+        // Creating the intent of when the user presses the share button
 
-        Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+        if(item.getItemId() == R.id.action_share) {
+
+            RssItem itemToShare = itemAdapter.getExpandedItem();
+
+            if(itemToShare == null) {
+                return false;
+            }
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s (%s)", itemToShare.getTitle(), itemToShare.getUrl()));
+            shareIntent.setType("text/plain");
+            Intent chooser = Intent.createChooser(shareIntent, getString(R.string.share_chooser_title));
+            startActivity(chooser);
+
+        }
+        else {
+            Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+        }
 
         return super.onOptionsItemSelected(item);
 
@@ -326,13 +364,16 @@ public class BloclyActivity extends ActionBarActivity implements
 
         if (positionToContract > -1) {
             itemAdapter.notifyItemChanged(positionToContract);
+
         }
 
         if (positionToExpand > -1) {
             itemAdapter.notifyItemChanged(positionToExpand);
+            animateShareItem(true);
         }
         // When there is no view to expand, avoid scrolling the RecyclerView
         else {
+            animateShareItem(false);
             return;
         }
 
@@ -354,4 +395,49 @@ public class BloclyActivity extends ActionBarActivity implements
         recyclerView.smoothScrollBy(0, viewToExpand.getTop() - lessToScroll);
 
     }
+
+    @Override
+    public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
+
+        Intent visitIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssItem.getUrl()));
+        startActivity(visitIntent);
+
+    }
+
+    // ------------ Separate Methods Area --------------- //
+
+    /*
+     * Method to animate share icon when item is expanded
+     *
+     */
+
+    private void animateShareItem(final boolean enabled) {
+
+        MenuItem shareItem = menu.findItem(R.id.action_share);
+
+        if(shareItem.isEnabled() == enabled) {
+            return; // Stop the method
+        }
+
+        shareItem.setEnabled(enabled);
+
+        final Drawable shareIcon = shareItem.getIcon();
+
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(enabled ? new int[] {0, 255} : new int[] {255,0});
+        valueAnimator.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                shareIcon.setAlpha((Integer) animation.getAnimatedValue());
+            }
+
+        });
+
+        valueAnimator.start();
+
+    }
+
 }
