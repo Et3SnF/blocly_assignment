@@ -3,8 +3,12 @@ package io.bloc.android.blocly.api;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.BuildConfig;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -40,16 +44,51 @@ public class DataSource {
             public void run() {
 
                 // Always open database in background thread
+                // The true is there so that Blocly creates the database each time. This will stop
+                // for any duplicate feeds being inside the database
 
-                if(BuildConfig.DEBUG && false) {
+                if(BuildConfig.DEBUG && true) {
                     BloclyApplication.getSharedInstance().deleteDatabase("blocly_db");
                 }
 
                 SQLiteDatabase writableDatabase = databaseOpenHelper.getWritableDatabase();
 
-                new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml")
-                        .performRequest();
-                
+                List<GetFeedsNetworkRequest.FeedResponse> feedResponses =
+                        new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
+                GetFeedsNetworkRequest.FeedResponse androidCentral = feedResponses.get(0);
+
+                long androidCentralFeedId = new RssFeedTable.Builder()
+                        .setFeedURL(androidCentral.channelFeedURL)
+                        .setSiteURL(androidCentral.channelURL)
+                        .setTitle(androidCentral.channelTitle)
+                        .setDescription(androidCentral.channelDescription)
+                        .insert(writableDatabase);
+
+                for(GetFeedsNetworkRequest.ItemResponse itemResponse : androidCentral.channelItems) {
+
+                    long itemPubDate = System.currentTimeMillis();
+                    DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+
+                    try {
+                        itemPubDate = dateFormat.parse(itemResponse.itemPubDate).getTime();
+                    }
+                    catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    new RssItemTable.Builder()
+                            .setTitle(itemResponse.itemDescription)
+                            .setDescription(itemResponse.itemDescription)
+                            .setEnclosure(itemResponse.itemEnclosureURL)
+                            .setMIMEType(itemResponse.itemEnclosureMIMEType)
+                            .setLink(itemResponse.itemURL)
+                            .setGUID(itemResponse.itemGUID)
+                            .setPubDate(itemPubDate)
+                            .setRSSFeed(androidCentralFeedId)
+                            .insert(writableDatabase);
+
+                }
+
             }
 
         }).start();
