@@ -1,5 +1,7 @@
 package io.bloc.android.blocly.api.network;
 
+import android.content.ContentValues;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -30,6 +32,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_ATTRIBUTE_TYPE = "type";
 
     String[] feedsUrls;
+    public ContentValues feedContentValues;
+    public ContentValues itemContentValues;
 
     public GetFeedsNetworkRequest(String... feedsUrls) {
         this.feedsUrls = feedsUrls;
@@ -107,7 +111,6 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
                     responseItems.add(new ItemResponse(itemURL, itemTitle, itemDescription,
                             itemGUID, itemPubDate, itemEnclosureURL, itemEnclosureMIMEType));
-
                 }
 
                 // responseItems is a list!
@@ -171,7 +174,6 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
             this.channelItems = channelItems;
         }
     }
-
 
     // Class for items objects
 
