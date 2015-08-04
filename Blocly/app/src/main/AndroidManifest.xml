@@ -14,6 +14,9 @@
         <activity android:name=".ui.activity.BloclyActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.WEB_SEARCH"/>
+                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.DIAL"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>

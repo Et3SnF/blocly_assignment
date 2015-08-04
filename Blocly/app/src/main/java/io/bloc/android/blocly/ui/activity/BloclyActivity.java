@@ -2,6 +2,8 @@ package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -13,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +23,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -52,6 +56,8 @@ public class BloclyActivity extends ActionBarActivity implements
     private View overflowButton;
 
     private RecyclerView recyclerView;
+
+    private final String TAG = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,6 +228,26 @@ public class BloclyActivity extends ActionBarActivity implements
 
         itemAdapter.setDataSource(this);
         itemAdapter.setDelegate(this);
+
+        // queryIntentActivities(Intent, int)
+
+        // Query intent activities
+
+        List<ResolveInfo> list1 = getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_VIEW, null), PackageManager.GET_INTENT_FILTERS);
+        List<ResolveInfo> list2 = getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_SEND, null), PackageManager.GET_INTENT_FILTERS);
+        List<ResolveInfo> list3 = getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_DIAL, null), PackageManager.GET_INTENT_FILTERS);
+
+        for(ResolveInfo i : list1) {
+            Log.i(TAG, i.toString());
+        }
+
+        for(ResolveInfo j : list2) {
+            Log.i(TAG, j.toString());
+        }
+
+        for(ResolveInfo k : list3) {
+            Log.i(TAG, k.toString());
+        }
 
     }
 
