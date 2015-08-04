@@ -58,7 +58,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 String channelURL = optFirstTagFromDocument(xmlDocument, XML_TAG_LINK);
 
                 NodeList allItemNodes = xmlDocument.getElementsByTagName(XML_TAG_ITEM);
-                List<FeedResponse.ItemResponse> responseItems = new ArrayList<FeedResponse.ItemResponse>(allItemNodes.getLength());
+                List<ItemResponse> responseItems = new ArrayList<ItemResponse>(allItemNodes.getLength());
 
                 for(int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
 
@@ -105,7 +105,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                         }
                     }
 
-                    responseItems.add(new FeedResponse.ItemResponse(itemURL, itemTitle, itemDescription,
+                    responseItems.add(new ItemResponse(itemURL, itemTitle, itemDescription,
                             itemGUID, itemPubDate, itemEnclosureURL, itemEnclosureMIMEType));
 
                 }
@@ -170,34 +170,35 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
             this.channelURL = channelURL;
             this.channelItems = channelItems;
         }
+    }
 
-        // Class for items objects
 
-        public static class ItemResponse {
+    // Class for items objects
 
-            // Member variables. They are final so no need for setters or getters
+    public static class ItemResponse {
 
-            public final String itemURL;
-            public final String itemTitle;
-            public final String itemDescription;
-            public final String itemGUID;
-            public final String itemPubDate;
-            public final String itemEnclosureURL;
-            public final String itemEnclosureMIMEType;
+        // Member variables. They are final so no need for setters or getters
 
-            // Constructor
+        public final String itemURL;
+        public final String itemTitle;
+        public final String itemDescription;
+        public final String itemGUID;
+        public final String itemPubDate;
+        public final String itemEnclosureURL;
+        public final String itemEnclosureMIMEType;
 
-            public ItemResponse(String itemDescription, String itemURL, String itemTitle, String itemGUID, String itemPubDate, String itemEnclosureURL, String itemEnclosureMIMEType) {
+        // Constructor
 
-                this.itemDescription = itemDescription;
-                this.itemURL = itemURL;
-                this.itemTitle = itemTitle;
-                this.itemGUID = itemGUID;
-                this.itemPubDate = itemPubDate;
-                this.itemEnclosureURL = itemEnclosureURL;
-                this.itemEnclosureMIMEType = itemEnclosureMIMEType;
+        public ItemResponse(String itemDescription, String itemURL, String itemTitle, String itemGUID, String itemPubDate, String itemEnclosureURL, String itemEnclosureMIMEType) {
 
-            }
+            this.itemDescription = itemDescription;
+            this.itemURL = itemURL;
+            this.itemTitle = itemTitle;
+            this.itemGUID = itemGUID;
+            this.itemPubDate = itemPubDate;
+            this.itemEnclosureURL = itemEnclosureURL;
+            this.itemEnclosureMIMEType = itemEnclosureMIMEType;
+
         }
     }
 
