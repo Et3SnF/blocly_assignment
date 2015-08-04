@@ -1,7 +1,10 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
+import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
@@ -52,6 +56,16 @@ public class BloclyActivity extends ActionBarActivity implements
     private View overflowButton;
 
     private RecyclerView recyclerView;
+
+    // resets the data found
+
+    private BroadcastReceiver dataSourceBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            itemAdapter.notifyDataSetChanged();
+            navigationDrawerAdapter.notifyDataSetChanged();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +237,10 @@ public class BloclyActivity extends ActionBarActivity implements
         itemAdapter.setDataSource(this);
         itemAdapter.setDelegate(this);
 
+        // Register the broadcast receiver
+
+        registerReceiver(dataSourceBroadcastReceiver, new IntentFilter(DataSource.ACTION_DOWNLOAD_COMPLETED));
+
     }
 
     // When Options menu is created, inflate the blocly menu layout
@@ -235,6 +253,14 @@ public class BloclyActivity extends ActionBarActivity implements
         animateShareItem(itemAdapter.getExpandedItem() != null); //animate share icon when expanded
         return super.onCreateOptionsMenu(menu);
 
+    }
+
+    // Destroy any unregistered receivers
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(dataSourceBroadcastReceiver);
     }
 
     // These methods are required when something in the Activity changes. The drawer needs to
