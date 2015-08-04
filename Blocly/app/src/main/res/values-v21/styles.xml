@@ -29,7 +29,7 @@
         <item name="android:textColor">@color/white_87</item>
         <item name="android:textSize">24sp</item>
         <item name="android:ellipsize">end</item>
-        <item name="robotoFont">Regular</item>
+        <item name="robotoFont">CondensedLight</item>
 
     </style>
 
@@ -55,10 +55,11 @@
 
     <style name = "Button">
 
+        <item name = "android:background">@drawable/list_selector</item>
         <item name = "android:textColor">@drawable/btn_text_drawable</item>
         <item name = "android:textSize">14sp</item>
         <item name = "android:textAllCaps">true</item>
-        <item name = "robotoFont">Medium</item>
+        <item name = "robotoFont">CondensedLight</item>
 
     </style>
 

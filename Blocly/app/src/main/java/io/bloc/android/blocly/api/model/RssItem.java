@@ -17,7 +17,8 @@ public class RssItem {
 
     // Constructor
 
-    public RssItem(String guid, String title, String description, String url, String imageUrl, long rssFeedId, long datePublished, boolean favorite, boolean archived) {
+    public RssItem(String guid, String title, String description, String url, String imageUrl,
+                   long rssFeedId, long datePublished, boolean favorite, boolean archived) {
         this.guid = guid;
         this.title = title;
         this.description = description;

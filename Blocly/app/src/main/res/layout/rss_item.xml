@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding = "6dp"
-    android:background="@drawable/list_selector"
-    android:clickable="true">
+    android:background="@drawable/list_selector">
 
     <!-- Checkpoint 38 Material - Include an image layout -->
 
@@ -135,7 +133,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <io.bloc.android.blocly.ui.widget.RobotoTextView
+        <io.bloc.android.blocly.ui.widget.RobotoButton
             style = "@style/Button"
             android:id="@+id/tv_rss_item_visit_site"
             android:layout_width="wrap_content"

@@ -12,12 +12,10 @@ import io.bloc.android.blocly.api.DataSource;
 
 public class BloclyApplication extends Application {
 
-    // #1
     public static BloclyApplication getSharedInstance() {
         return sharedInstance;
     }
 
-    // #2
     public static DataSource getSharedDataSource() {
         return BloclyApplication.getSharedInstance().getDataSource();
     }
@@ -25,7 +23,6 @@ public class BloclyApplication extends Application {
     private static BloclyApplication sharedInstance;
     private DataSource dataSource;
 
-    // #3
     @Override
     public void onCreate() {
         super.onCreate();
