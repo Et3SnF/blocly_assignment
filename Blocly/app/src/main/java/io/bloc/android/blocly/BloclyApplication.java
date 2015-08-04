@@ -30,7 +30,7 @@ public class BloclyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sharedInstance = this;
-        dataSource = new DataSource();
+        dataSource = new DataSource(this);
 
         // Necessary methods to use Image Library (this is in the README)
 
