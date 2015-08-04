@@ -1,11 +1,13 @@
 package io.bloc.android.blocly.ui.adapter;
 
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -192,15 +194,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
                 // itemView came from RecyclerView.java file!
 
-                // if contentExpanded is true, make it visible, otherwise, just don't show full content
-                contentExpanded = !contentExpanded;
-                expandedContentWrapper.setVisibility(contentExpanded ? View.VISIBLE : View.GONE);
+                animateContent(!contentExpanded);
 
-                // if contentExpanded is true, make it visible, otherwise, just don't show full content
-
-                expandedContentWrapper.setVisibility(contentExpanded ? View.VISIBLE : View.GONE);
-
-                content.setVisibility(contentExpanded ? View.GONE : View.VISIBLE);
             }
             else {
                 Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
@@ -213,6 +208,107 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             Log.v(TAG, "Checked changed to: " + isChecked);
+        }
+
+        // --- Animate Content --- //
+
+        private void animateContent(final boolean expand) {
+
+            // If it's already in its desired state, just run this if-statement
+
+            if ((expand && contentExpanded) || (!expand && !contentExpanded)) {
+                return;
+            }
+
+            // This area beyond this point is when we need to animate stuff
+
+            int startingHeight = expandedContentWrapper.getMeasuredHeight();
+            int finalHeight = content.getMeasuredHeight();
+
+            if (expand) {
+
+                startingHeight = finalHeight;
+
+                // Set the transparency and the visibility of the wrapper (View class)
+
+                expandedContentWrapper.setAlpha(0f);
+                expandedContentWrapper.setVisibility(View.VISIBLE);
+
+                // Use the measure method to ask view to measure itself (the width of content)
+
+                expandedContentWrapper.measure(View.MeasureSpec.makeMeasureSpec(content.getWidth(),
+                        View.MeasureSpec.EXACTLY), ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                // This height is actually unlimited
+
+                finalHeight = expandedContentWrapper.getMeasuredHeight();
+            } else {
+                content.setVisibility(View.VISIBLE);
+            }
+
+            // Animation progress is a floating point - between 0.0 to 1.0 where 0.5 means halfway through
+            // THis is also used to set the opacity to give it a transition
+
+            //important method overall to get this animation going
+
+            startAnimator(startingHeight, finalHeight, new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+
+                    float animatedFraction = animation.getAnimatedFraction();
+                    float wrapperAlpha = expand ? animatedFraction : 1f - animatedFraction;
+                    float contentAlpha = 1f - wrapperAlpha;
+
+                    // Set the opacity of the wrapper and content (causes a cross-fade)
+
+                    expandedContentWrapper.setAlpha(wrapperAlpha);
+                    content.setAlpha(contentAlpha);
+
+                    // We get teh layout parameters, and set the height directly in code.
+                    // If it equals to 1.0, set the parameters to "wrap_content". If not,
+                    // get the animated value
+
+                    expandedContentWrapper.getLayoutParams().height = animatedFraction == 1f ?
+                            ViewGroup.LayoutParams.WRAP_CONTENT : (Integer) animation.getAnimatedValue();
+
+                    // This method asks itself to redraw itself on the screen
+
+                    expandedContentWrapper.requestLayout();
+
+                    if (animatedFraction == 1f) {
+                        if (expand) {
+                            content.setVisibility(View.GONE);
+                        } else {
+                            expandedContentWrapper.setVisibility(View.GONE);
+                        }
+                    }
+
+                }
+            });
+
+            contentExpanded = expand;
+
+        }
+
+        private void startAnimator(int start, int end, ValueAnimator.AnimatorUpdateListener animatorUpdateListener) {
+
+            ValueAnimator valueAnimator = ValueAnimator.ofInt(start, end);
+            valueAnimator.addUpdateListener(animatorUpdateListener);
+
+            // Animator just counts from one to the end. That's it. Nothing more.
+
+            valueAnimator.setDuration(itemView.getResources().getInteger(android.R.integer.config_mediumAnimTime));
+
+            // AccelerateDecelerateInterpolator method is there to animate constantly up until the end
+            // where it gradually slows down to give that better transition
+
+            valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            // Start the animation!
+
+            valueAnimator.start();
+
         }
 
     }
