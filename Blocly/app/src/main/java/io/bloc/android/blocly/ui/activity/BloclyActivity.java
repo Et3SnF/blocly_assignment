@@ -57,13 +57,16 @@ public class BloclyActivity extends ActionBarActivity implements
 
     private RecyclerView recyclerView;
 
-    private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
-    private List<RssItem> currentItems = new ArrayList<RssItem>();
+    private List<RssFeed> allFeeds;
+    private List<RssItem> currentItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
+
+        allFeeds = new ArrayList<>();
+        currentItems = new ArrayList<>();
 
         // Add the toolbar support here
 
@@ -77,7 +80,6 @@ public class BloclyActivity extends ActionBarActivity implements
         // Display the recyclerView, which contains the adapter, layout manager, and animator
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
-        // #12
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(itemAdapter);
@@ -89,7 +91,6 @@ public class BloclyActivity extends ActionBarActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
-
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0) {
 
             // Created an anonymous class to add actions when drawer is opened and closed
@@ -237,7 +238,7 @@ public class BloclyActivity extends ActionBarActivity implements
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                BloclyApplication.getSharedDataSource().refreshFeed("http://feeds.feedburner.com/androidcentral?format=xml",
 
                         new DataSource.Callback<RssFeed>() {
                             @Override
@@ -260,7 +261,7 @@ public class BloclyActivity extends ActionBarActivity implements
                                                 }
 
                                                 currentItems.addAll(rssItems);
-                                                itemAdapter.notifyItemRangeInserted(0, currentItems.size());
+                                                itemAdapter.notifyDataSetChanged();
                                                 swipeRefreshLayout.setRefreshing(false);
                                             }
 
@@ -277,7 +278,9 @@ public class BloclyActivity extends ActionBarActivity implements
                                 swipeRefreshLayout.setRefreshing(false);
                             }
                         });
-            }
+
+                }
+
         });
 
     }
