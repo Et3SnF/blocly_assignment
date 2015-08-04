@@ -31,7 +31,7 @@ public class DataSource {
                 "http://favoritefeed.net", "http://feeds.feedburner.com/favorite_feed?format=xml"));
         for (int i = 0; i < 10; i++) {
             items.add(new RssItem(String.valueOf(i),
-                    "An incredible news story #" + i,
+                    "An incredible news story #" + (i+1),
                     "You won't believe how exciting this news story is, get ready to be blown away by its amazingness.",
                     "http://favoritefeed.net?story_id=an-incredible-news-story",
                     "http://rs1img.memecdn.com/silly-dog_o_511213.jpg",

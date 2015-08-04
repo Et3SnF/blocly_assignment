@@ -13,6 +13,10 @@
 
     <color name="white_primary">#F9F9F9</color>
     <color name="white_primary_54">#79F9F9F9</color>
+    <color name="white_87">#DDFFFFFF</color>
+    <color name="white_54">#79FFFFFF</color>
+    <color name="white_26">#3AFFFFFF</color>
+    <color name="white_12">#1BFFFFFF</color>
     <color name="black_87">#DD000000</color>
     <color name="black_54">#79000000</color>
     <color name="black_26">#3A000000</color>

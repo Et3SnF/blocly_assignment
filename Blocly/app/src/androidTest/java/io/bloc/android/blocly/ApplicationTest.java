@@ -1,4 +1,4 @@
-package com.nickpontiff.blocapp;
+package io.bloc.android.blocly;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
