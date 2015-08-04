@@ -166,11 +166,12 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
         // Constructor
 
-        public FeedResponse(String channelDescription, String channelFeedURL, String channelTitle, String channelURL, List<ItemResponse> channelItems) {
-            this.channelDescription = channelDescription;
+        public FeedResponse(String channelFeedURL, String channelTitle, String channelURL,
+                            String channelDescription, List<ItemResponse> channelItems) {
             this.channelFeedURL = channelFeedURL;
             this.channelTitle = channelTitle;
             this.channelURL = channelURL;
+            this.channelDescription = channelDescription;
             this.channelItems = channelItems;
         }
     }
@@ -190,17 +191,16 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         public final String itemEnclosureMIMEType;
 
         // Constructor
-
-        public ItemResponse(String itemDescription, String itemURL, String itemTitle, String itemGUID, String itemPubDate, String itemEnclosureURL, String itemEnclosureMIMEType) {
-
-            this.itemDescription = itemDescription;
+        
+        public ItemResponse(String itemURL, String itemTitle, String itemDescription, String itemGUID,
+                            String itemPubDate, String itemEnclosureURL, String itemEnclosureMIMEType) {
             this.itemURL = itemURL;
             this.itemTitle = itemTitle;
+            this.itemDescription = itemDescription;
             this.itemGUID = itemGUID;
             this.itemPubDate = itemPubDate;
             this.itemEnclosureURL = itemEnclosureURL;
             this.itemEnclosureMIMEType = itemEnclosureMIMEType;
-
         }
     }
 
