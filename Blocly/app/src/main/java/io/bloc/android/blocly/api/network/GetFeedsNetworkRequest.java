@@ -35,6 +35,9 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_ATTRIBUTE_URL = "url";
     private static final String XML_ATTRIBUTE_TYPE = "type";
 
+    private static final String XML_TAG_MEDIA_DESCRIPTION = "media:description";
+    private static final String XML_TAG_MEDIA_ENCLOSURE = "media:enclosure";
+
     String[] feedUrls;
 
     public GetFeedsNetworkRequest(String... feedUrls) {
@@ -96,9 +99,19 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                         else if (XML_TAG_DESCRIPTION.equalsIgnoreCase(tag)) {
 
                             String descriptionText = tagNode.getTextContent();
-                            // For parsing
-                            itemImageURL = parseImageFromHTML(descriptionText);
+                             // For parsing
                             itemDescription = parseTextFromHTML(descriptionText);
+                            itemImageURL = parseImageFromHTML(descriptionText);
+                            String youtubeImageURL = "http://img.youtube.com/vi/" + parseYoutubeIDFromHTML(descriptionText) + "/0.jpg";
+
+                            if(itemImageURL == null) {
+                                itemImageURL = youtubeImageURL;
+                            }
+
+                            if(youtubeImageURL.equalsIgnoreCase("http://img.youtube.com/vi/null/0.jpg")) {
+                                itemImageURL = null;
+                            }
+
                         }
                         else if (XML_TAG_ENCLOSURE.equalsIgnoreCase(tag)) {
                             NamedNodeMap enclosureAttributes = tagNode.getAttributes();
@@ -120,6 +133,11 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                             NamedNodeMap mediaAttributes = tagNode.getAttributes();
                             itemMediaURL = mediaAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
                             itemMediaMIMEType = mediaAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
+                        }
+                        else if (XML_TAG_MEDIA_DESCRIPTION.equalsIgnoreCase(tag)) {
+                            String mediaDescText = tagNode.getTextContent();
+                            // For parsing
+                            itemDescription = parseTextFromHTML(mediaDescText);
                         }
                     }
 
@@ -161,6 +179,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 setErrorCode(ERROR_PARSING);
                 return null;
             }
+
         }
 
         return responseFeeds;
@@ -192,6 +211,17 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         }
 
         return imgElements.attr("src");
+    }
+
+    static String parseYoutubeIDFromHTML(String htmlString) {
+        org.jsoup.nodes.Document document = Jsoup.parse(htmlString);
+        Elements videoElements = document.select("iframe");
+
+        if(videoElements.isEmpty()) {
+            return null;
+        }
+
+        return videoElements.attr("src").substring(30,41);
     }
 
     // Class for reading the feed. Feed first, then items
