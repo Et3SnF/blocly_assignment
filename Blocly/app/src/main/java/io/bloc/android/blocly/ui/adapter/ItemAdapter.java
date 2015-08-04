@@ -12,11 +12,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
+import java.lang.ref.WeakReference;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -47,7 +48,39 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         return BloclyApplication.getSharedDataSource().getItems().size();
     }
 
-    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    // static interface to delegate to another class
+
+    public static interface ItemAdapterDelegate {
+
+        public void didSelectExpandItem(ItemAdapter itemAdapter, View itemView);
+        public void didSelectContractItem(ItemAdapter itemAdapter, View itemView);
+        public void didSelectVisitSite(ItemAdapter itemAdapter, TextView visitSite);
+        public void didSelectFavoritesCheck(ItemAdapter itemAdapter, CheckBox favorites);
+        public void didSelectArchivedCheck(ItemAdapter itemAdapter, CheckBox archived);
+
+    }
+
+    // Make any upcoming delegate a weak reference
+
+    WeakReference<ItemAdapterDelegate> itemAdapterDelegate;
+
+    // Setter and Getters of to ItemAdapter delegate
+
+    public void setItemAdapterDelegate(ItemAdapterDelegate itemAdapterDelegate) {
+        this.itemAdapterDelegate = new WeakReference<ItemAdapterDelegate>(itemAdapterDelegate);
+    }
+
+    public ItemAdapterDelegate getItemAdapterDelegate() {
+
+        if(itemAdapterDelegate == null) {
+            return null;
+        }
+
+        return this.itemAdapterDelegate.get();
+
+    }
+
+    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener {
 
         // --- Member variables for the view holder --- //
 
@@ -83,7 +116,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         // Constructor
 
-        public ItemAdapterViewHolder(View itemView) {
+        public ItemAdapterViewHolder(final View itemView) {
             super(itemView);
 
             // Declare TextView variables to layout
@@ -108,18 +141,90 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             archiveCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_check_mark);
             favoriteCheckbox = (CheckBox) itemView.findViewById(R.id.cb_rss_item_favorite_star);
 
-            // Activate clickListener for whole ViewHolder
+            //---------//
 
-            itemView.setOnClickListener(this);
+            // Activate clickListener for one ViewHolder
 
-            // Activate Listeners for checkboxes
+            itemView.setOnClickListener(new View.OnClickListener() {
 
-            archiveCheckbox.setOnCheckedChangeListener(this);
-            favoriteCheckbox.setOnCheckedChangeListener(this);
+                @Override
+                public void onClick(View view) {
+
+                    if (view == itemView) {
+                        animateContent(!contentExpanded);
+                    }
+
+                    if(getItemAdapterDelegate() == null) {
+                        return;
+                    }
+
+                    if(contentExpanded) {
+                        getItemAdapterDelegate().didSelectExpandItem(ItemAdapter.this, itemView);
+                    }
+                    else if(!contentExpanded) {
+                        getItemAdapterDelegate().didSelectContractItem(ItemAdapter.this, itemView);
+                    }
+
+                }
+
+            });
+
+            // Activate Listeners for archive checkbox
+
+            archiveCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    Log.v(TAG, "Archive Checked changed to: " + isChecked);
+
+                    if(getItemAdapterDelegate() == null) {
+                        return;
+                    }
+
+                    getItemAdapterDelegate().didSelectArchivedCheck(ItemAdapter.this, archiveCheckbox);
+                }
+
+            });
+
+            // Activate listener for favorite checkbox
+
+            favoriteCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    Log.v(TAG, "Archive Checked changed to: " + isChecked);
+
+                    if(getItemAdapterDelegate() == null) {
+                        return;
+                    }
+
+                    getItemAdapterDelegate().didSelectFavoritesCheck(ItemAdapter.this, favoriteCheckbox);
+                }
+
+            });
 
             // Activate listener for Visit Site link
 
-            visitSite.setOnClickListener(this);
+            visitSite.setOnClickListener(new View.OnClickListener() {
+
+                // --- OnClickListener Methods -- //
+
+                @Override
+                public void onClick(View view) {
+
+                    //Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
+
+                    if(getItemAdapterDelegate() == null) {
+                        return;
+                    }
+
+                    getItemAdapterDelegate().didSelectVisitSite(ItemAdapter.this, visitSite);
+
+                }
+
+            });
 
         }
 
@@ -153,7 +258,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         }
 
-        // Implement ImageLoadingListener methods
+        /**
+         *
+         * ImageLoadingListener Methods
+         *
+         */
 
         @Override
         public void onLoadingStarted(String imageUri, View view) {
@@ -183,31 +292,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             // Attempt a retry
             ImageLoader.getInstance().loadImage(imageUri, this);
 
-        }
-
-        // --- OnClickListener Methods -- //
-
-        @Override
-        public void onClick(View view) {
-
-            if (view == itemView) {
-
-                // itemView came from RecyclerView.java file!
-
-                animateContent(!contentExpanded);
-
-            }
-            else {
-                Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
-            }
-
-        }
-
-        // -- OnCheckChangedListener Methods -- //
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Log.v(TAG, "Checked changed to: " + isChecked);
         }
 
         // --- Animate Content --- //
@@ -242,7 +326,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 // This height is actually unlimited
 
                 finalHeight = expandedContentWrapper.getMeasuredHeight();
-            } else {
+            }
+            else {
                 content.setVisibility(View.VISIBLE);
             }
 

@@ -10,6 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import io.bloc.android.blocly.R;
@@ -20,7 +23,8 @@ import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 // ActionBarActivity is required to use when I have Theme.AppCompat in the styles.xml
 // This has backwards compatible features
 
-public class BloclyActivity extends ActionBarActivity implements NavigationDrawerAdapter.NavigationDrawerAdapterDelegate {
+public class BloclyActivity extends ActionBarActivity implements
+        NavigationDrawerAdapter.NavigationDrawerAdapterDelegate, ItemAdapter.ItemAdapterDelegate {
 
     private ItemAdapter itemAdapter;
 
@@ -81,6 +85,10 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
 
         navigationDrawerAdapter.setDelegate(this);
 
+        // Delegate BlocActivity from ItemAdapter class
+
+        itemAdapter.setItemAdapterDelegate(this);
+
     }
 
     // These methods are required when something in the Activity changes. The drawer needs to
@@ -127,5 +135,35 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
         drawerLayout.closeDrawers();
         Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
     }
-    
+
+    /**
+     *
+     * ItemAdapterDelegateMethods
+     *
+     */
+
+    @Override
+    public void didSelectExpandItem(ItemAdapter itemAdapter, View itemView) {
+        Toast.makeText(this, "BlocActivity: View Expansion Detected", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void didSelectContractItem(ItemAdapter itemAdapter, View itemView) {
+        Toast.makeText(this, "BlocActivity: View Contraction Detected", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void didSelectVisitSite(ItemAdapter itemAdapter, TextView visitSite) {
+        Toast.makeText(this, "BlocActivity: Visit Site Button Event Detected", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void didSelectFavoritesCheck(ItemAdapter itemAdapter, CheckBox favorites) {
+        Toast.makeText(this, "BlocActivity: Favorites Checkbox Event Detected!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void didSelectArchivedCheck(ItemAdapter itemAdapter, CheckBox archived) {
+        Toast.makeText(this, "BlocActivity: Archived Checkbox Event Detected", Toast.LENGTH_SHORT).show();
+    }
 }
