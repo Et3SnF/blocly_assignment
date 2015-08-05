@@ -72,21 +72,17 @@ public class ApplicationTest extends ApplicationTestCase<BloclyApplication> {
             assertNotNull(cursor);
         }
 
-        if(cursor.moveToFirst()) {
+        int i = 0;
 
-            int i = 0;
+        while(cursor.moveToNext()) {
+            i++;
+        }
 
-            while(cursor.moveToNext()) {
-                i++;
-            }
-
-            if(i > 0) {
-                assertTrue(true);
-            }
-            else if (!cursor.moveToNext() && i == 0) {
-                assertTrue(false);
-            }
-
+        if(i > 0) {
+            assertTrue(true);
+        }
+        else if (!cursor.moveToNext() && i == 0) {
+            assertTrue(false);
         }
 
     }
