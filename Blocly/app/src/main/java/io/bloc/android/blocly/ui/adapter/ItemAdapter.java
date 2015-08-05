@@ -29,6 +29,7 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.api.model.database.DatabaseOpenHelper;
 import io.bloc.android.blocly.ui.UIUtils;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterViewHolder> {
@@ -52,6 +53,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         public void onFavoriteChecked(ItemAdapter itemAdapter, RssItem rssItem);
     }
 
+    private int collapsedItemHeight;
+
     // For logcat
 
     private static String TAG = ItemAdapter.class.getSimpleName();
@@ -61,14 +64,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
     private Map<Long, Integer> rssFeedToColor = new HashMap<Long, Integer>();
 
     // Related to items and feeds
-
     private RssItem expandedItem = null;
     private WeakReference<Delegate> delegate;
+
     private WeakReference<DataSource> dataSource;
 
     // For scrolling considerations
 
-    private int collapsedItemHeight;
     private int expandedItemHeight;
 
     @Override
@@ -188,6 +190,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         View expandedContentWrapper;
         TextView expandedContent;
         TextView visitSite;
+
+        DatabaseOpenHelper databaseOpenHelper;
 
         // For Tablet
 
@@ -358,12 +362,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
             // Delegation
-//            getDelegate().onFavoriteChecked(ItemAdapter.this, rssItem);
+            getDelegate().onFavoriteChecked(ItemAdapter.this, rssItem);
 
             if(isChecked) {
                 Toast.makeText(BloclyApplication.getSharedInstance(),
                         "Favorite Checkbox Highlighted", Toast.LENGTH_SHORT).show();
-
+                BloclyApplication.getSharedDataSource().insertFavoriteIntoItem(rssItem, 1);
                 // Get the row id of that particular RssItem, and insert into the RssItemTable's COLUMN_FAVORITE column
                     // Execute query: "INSERT INTO rss_items(COLUMN_FAVORITE) VALUES("1") WHERE COLUMN_GUID = rssItem.getGUID()"
                 // Otherwise, just change the value to default value of 0
@@ -373,6 +377,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             else {
                 Toast.makeText(BloclyApplication.getSharedInstance(),
                         "Favorite Checkbox Unchecked", Toast.LENGTH_SHORT).show();
+                BloclyApplication.getSharedDataSource().insertFavoriteIntoItem(rssItem, 0);
             }
 
 

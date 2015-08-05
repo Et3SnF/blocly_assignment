@@ -1,5 +1,6 @@
 package io.bloc.android.blocly.api;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -362,6 +363,21 @@ public class DataSource {
         }
 
         return getFeedsNetworkRequest.getErrorCode() != 0;
+    }
+
+
+    public void insertFavoriteIntoItem(RssItem rssItem, int value) {
+
+        // Insert into rss_items(COLUMN_FAVORITE) VALUES("0") WHERE guid = (string value of a long)
+        // UPDATE rss_items SET is_favorite = 1 WHERE guid = (rssItem.getGuid());
+
+        databaseOpenHelper.getReadableDatabase();
+        ContentValues favoriteValue = new ContentValues();
+        favoriteValue.put("is_favorite", String.valueOf(value));
+
+        databaseOpenHelper.getWritableDatabase()
+                .update("rss_items", favoriteValue, "is_favorite = ?", new String[]{String.valueOf(value)});
+
     }
 
     long insertResponseToDatabase(long feedId, GetFeedsNetworkRequest.ItemResponse itemResponse) {
