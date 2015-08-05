@@ -1,8 +1,124 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+
+        <!-- Window Background -->
+        <item name="android:windowBackground">@color/background_color</item>
+
+        <!-- Drawer Arrow Style - Colors for ActionBar Items -->
+
+        <item name = "drawerArrowStyle">@style/DrawerArrow</item>
+
+        <!-- AppCompat Colors -->
+
+        <item name ="colorPrimary">@color/action_bar_color</item>
+        <item name ="colorPrimaryDark">@color/status_bar_color</item>
+        <item name ="colorAccent">@color/accent</item>
+
+        <!-- Overflow/settings button on ActionBar -->
+
+        <item name ="android:actionOverflowButtonStyle">@style/OverflowButton</item>
+
+    </style>
+
+    <!-- Style for the overflow button..to make this backwards compatible-->
+
+    <style name = "OverflowButton" parent = "android:Widget.Holo.ActionButton.Overflow">
+
+        <item name = "android:src">@drawable/ic_overflow_menu_selector</item>
+        <item name = "android:paddingLeft">@dimen/default_padding</item>
+
+    </style>
+
+    <!-- Style for Drawer Arrow Toggle -->
+    <!-- The parent provides supplies color, thickness, barSize, and gapBetweenBars-->
+
+    <style name = "DrawerArrow" parent = "Base.Widget.AppCompat.DrawerArrowToggle">
+
+        <item name ="color">@color/drawer_arrow_color</item>
+        <item name="middleBarArrowSize">16dp</item>
+        <item name="spinBars">true</item>
+        <item name="thickness">2dp</item>
+        <item name="topBottomBarArrowSize">15dp</item>
+
+    </style>
+
+    <!-- Style for roboto font -->
+
+    <style name="Headline">
+
+        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="robotoFont">Regular</item>
+
+    </style>
+
+    <!-- For the tablet -->
+
+    <style name="RssItemTitle" parent="Base.TextAppearance.AppCompat.Body2">
+        <item name="android:textColor">@color/white_54</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="robotoFont">Medium</item>
+    </style>
+
+    <style name="RssItemDetailHeader" parent="Base.TextAppearance.AppCompat.Display1">
+        <item name="android:textColor">@color/white_87</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!--- -->
+
+    <style name="Caption">
+
+        <item name="android:textColor">@color/red_50</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="robotoFont">Regular</item>
+
+    </style>
+
+    <style name="Body1">
+
+        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textSize">14sp</item>
+        <item name="robotoFont">Regular</item>
+
+    </style>
+
+    <!-- Style for VISIT SITE link -->
+
+    <style name = "Button">
+
+        <item name = "android:textColor">@drawable/btn_text_drawable</item>
+        <item name = "android:textSize">14sp</item>
+        <item name = "android:textAllCaps">true</item>
+        <item name = "robotoFont">Medium</item>
+
+    </style>
+
+    <!-- Style for the text in the Drawer (font, size, and alignment) -->
+    <!-- Text color is a drawable from navigation_item_text.xml drawable -->
+
+    <style name = "NavigationItem">
+
+        <item name = "android:textSize">14sp</item>
+
+        <!-- Change text color when pressed. Use drawable -->
+
+        <item name = "android:textColor">@drawable/navigation_item_text</item>
+        <item name = "android:singleLine">true</item>
+        <item name = "android:gravity">center_vertical</item>
+
+        <!-- This is the custom font -->
+
+        <item name = "robotoFont">Medium</item>
+
     </style>
 
 </resources>

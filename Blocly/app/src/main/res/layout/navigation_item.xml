@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Layout of the drawer -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/list_selector">
+
+    <!-- Padding for top of the drawer -->
+
+    <View
+        android:id="@+id/v_nav_item_top_padding"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_padding"/>
+
+    <!-- Navigation item with 16 dp paddings on left and right and 48dp height -->
+
+    <io.bloc.android.blocly.ui.widget.RobotoTextView
+        style = "@style/NavigationItem"
+        android:id="@+id/tv_nav_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/navigation_item_title_height"
+        android:layout_marginLeft="@dimen/navigation_item_horizontal_padding"
+        android:layout_marginRight="@dimen/navigation_item_horizontal_padding"/>
+
+    <!-- Padding for the bottom of the custom view -->
+
+    <View
+        android:id="@+id/v_nav_item_bottom_padding"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_padding"/>
+
+    <!-- Divider -->
+
+    <View
+        android:id="@+id/v_nav_item_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_divider"
+        android:background="@color/drawer_divider"/>
+
+</LinearLayout>

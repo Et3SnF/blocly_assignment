@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary">#17AFCA</color>
+    <color name="primary_dark">#138FA5</color>
+    <color name="accent">#FFFF7B</color>
+    <color name="windowBackground">#DFDFDF</color>
+    <color name="divider">@color/black_12</color>
+
+    <color name="text_primary">@color/black_87</color>
+    <color name="text_secondary">@color/black_54</color>
+    <color name="text_hint">@color/black_26</color>
+
+    <color name="white_primary">#F9F9F9</color>
+    <color name="white_primary_54">#79F9F9F9</color>
+    <color name="white_87">#DDFFFFFF</color>
+    <color name="white_54">#79FFFFFF</color>
+    <color name="white_26">#3AFFFFFF</color>
+    <color name="white_12">#1BFFFFFF</color>
+    <color name="black_87">#DD000000</color>
+    <color name="black_54">#79000000</color>
+    <color name="black_26">#3A000000</color>
+    <color name="black_12">#1B000000</color>
+
+    <color name ="action_bar_color">#333333</color>
+    <color name ="status_bar_color">#80333333</color>
+    <color name ="navigation_bar_color">#80FF0000</color>
+    <color name ="background_color">#111111</color>
+    <color name ="tablet_description_background">#222222</color>
+    <color name ="red_50">#80FF0000</color>
+    <color name ="blue_50">#800000FF</color>
+    <color name ="green_50">#8000FF00</color>
+
+    <color name="drawer_color">#E5111111</color>
+    <color name="drawer_divider">@color/white_54</color>
+    <color name="drawer_arrow_color">#80FF0000</color>
+
+</resources>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding = "6dp"
+    android:background="@drawable/list_selector"
+    android:clickable="true">
+
+    <!-- Checkpoint 38 Material - Include an image layout -->
+
+    <!-- Frame layouts stack views on top of one another -->
+
+    <FrameLayout
+        android:id = "@+id/fl_rss_item_image_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <!--The indeterminate state will show if the image loaded will have a circle spinner
+         rather than a progress download bar. To just show the circle spinner, use the two
+         indeterminate features (one to guarantee spinning bar and one for its state)
+         -->
+
+        <ProgressBar
+            android:id = "@+id/pb_rss_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateOnly="true"
+            android:indeterminate="true"/>
+
+        <!-- There is a strict specification of height here. To display a certain part
+        of the image , center crop it using the scaleType attribute and "centerCrop"-->
+
+        <ImageView
+            android:id = "@+id/iv_rss_item_image"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:scaleType = "centerCrop"/>
+
+    </FrameLayout>
+
+    <!-- Checkpoint 37 material -->
+
+    <!-- Note the first line. We defined a style earlier so to use all of its attributes
+     we do style = "@style/(name of style name)-->
+
+    <!-- 6/29/2015 - Made a minor tweak to make sure the header is below the ImageView -->
+
+    <io.bloc.android.blocly.ui.widget.RobotoTextView
+        style = "@style/Headline"
+        android:id = "@+id/tv_rss_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below = "@+id/fl_rss_item_image_header"
+        android:background = "#222222"
+        android:text = "New York Attacked by Giant Squid"/>
+
+    <!-- Checkbox is a subclass of Button, so we use android:button to set the drawables-->
+
+    <CheckBox
+        android:id="@+id/cb_rss_item_check_mark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentRight="true"
+        android:layout_below = "@+id/tv_rss_item_title"
+        android:button="@drawable/btn_check_checkbox"/>
+
+    <CheckBox
+        android:id="@+id/cb_rss_item_favorite_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/cb_rss_item_check_mark"
+        android:button= "@drawable/btn_star_checkbox"/>
+
+    <io.bloc.android.blocly.ui.widget.RobotoTextView
+        style = "@style/Caption"
+        android:id = "@+id/tv_rss_item_feed_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_rss_item_title"
+        android:layout_marginTop="8dp"
+        android:text = "@string/placeholder_headline"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@+id/cb_rss_item_check_mark"/>
+
+    <io.bloc.android.blocly.ui.widget.RobotoTextView
+        style = "@style/Body1"
+        android:id = "@+id/tv_rss_item_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below = "@+id/tv_rss_item_feed_title"
+        android:text = "@string/placeholder_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@+id/cb_rss_item_favorite_star"
+        android:lines ="3"
+        android:ellipsize="end"/>
+
+    <!-- The lines android:lines = "3" and ellipsize = "end"
+     are intended to be there for the "compact view" of stuff. We will
+     integrate the stuff below to give the ability to expand the information"
+     -->
+
+    <!-- The hidden elements are tucked inside this LinearLayout which
+    will be used to actually display the rest of the material along with
+    the link that was provided
+
+    Short preview text is visible by default and hidden linearLayout is gone
+    initially until it is expanded
+
+    What is inside this hidden LinearLayout. The full content and the
+    VISIT SITE link
+
+    -->
+
+    <LinearLayout
+        android:id="@+id/ll_rss_item_expanded_content_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_below="@id/tv_rss_item_feed_title"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/cb_rss_item_check_mark"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <io.bloc.android.blocly.ui.widget.RobotoTextView
+            style = "@style/Body1"
+            android:id="@+id/tv_rss_item_content_full"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <io.bloc.android.blocly.ui.widget.RobotoTextView
+            style = "@style/Button"
+            android:id="@+id/tv_rss_item_visit_site"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text = "@string/visit_site"
+            android:layout_marginTop="8dp"
+            android:paddingTop="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="8dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
