@@ -6,9 +6,11 @@ import android.os.Bundle;
 import io.bloc.android.blocly.R;
 
 public class BloclyActivity extends Activity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
     }
+
 }
