@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -59,6 +60,8 @@ public class BloclyActivity extends ActionBarActivity implements
 
     private List<RssFeed> allFeeds;
     private List<RssItem> currentItems;
+
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,6 +251,10 @@ public class BloclyActivity extends ActionBarActivity implements
                                     return;
                                 }
 
+                                if (!allFeeds.isEmpty()) {
+                                    allFeeds.clear();
+                                }
+
                                 allFeeds.add(rssFeed);
                                 navigationDrawerAdapter.notifyDataSetChanged();
 
@@ -259,6 +266,12 @@ public class BloclyActivity extends ActionBarActivity implements
                                                 if (isFinishing() || isDestroyed()) {
                                                     return;
                                                 }
+
+                                                if (!currentItems.isEmpty()) {
+                                                    currentItems.clear();
+                                                }
+
+                                                // Add new items only and delete current ones
 
                                                 currentItems.addAll(rssItems);
                                                 itemAdapter.notifyDataSetChanged();
@@ -279,11 +292,80 @@ public class BloclyActivity extends ActionBarActivity implements
                             }
                         });
 
-                }
+            }
 
         });
 
+        // Testing if this would recycle the activity to give that "auto-refresh"...this is to test
+        // If it does auto-refresh...
+
+        handler = new Handler();
+
+        handler.postDelayed(testRunnable, 1000);
+
     }
+
+    private final Runnable testRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+            BloclyApplication.getSharedDataSource().refreshFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+
+                    new DataSource.Callback<RssFeed>() {
+                        @Override
+                        public void onSuccess(RssFeed rssFeed) {
+
+                            if (isFinishing() || isDestroyed()) {
+                                return;
+                            }
+
+                            if (!allFeeds.isEmpty()) {
+                                allFeeds.clear();
+                            }
+
+                            allFeeds.add(rssFeed);
+                            navigationDrawerAdapter.notifyDataSetChanged();
+
+                            BloclyApplication.getSharedDataSource().fetchItemsForFeed(rssFeed,
+                                    new DataSource.Callback<List<RssItem>>() {
+                                        @Override
+                                        public void onSuccess(List<RssItem> rssItems) {
+
+                                            if (isFinishing() || isDestroyed()) {
+                                                return;
+                                            }
+
+                                            if (!currentItems.isEmpty()) {
+                                                currentItems.clear();
+                                            }
+
+                                            // Add new items only and delete current ones
+
+                                            currentItems.addAll(rssItems);
+                                            itemAdapter.notifyDataSetChanged();
+                                            swipeRefreshLayout.setRefreshing(false);
+
+                                            Toast.makeText(BloclyActivity.this, "Fetch Complete",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onError(String errorMessage) {
+                                            swipeRefreshLayout.setRefreshing(false);
+                                        }
+                                    });
+                        }
+
+                        @Override
+                        public void onError(String errorMessage) {
+                            Toast.makeText(BloclyActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+
+            handler.postDelayed(testRunnable, 300000);
+        }
+    };
 
     // When Options menu is created, inflate the blocly menu layout
 
