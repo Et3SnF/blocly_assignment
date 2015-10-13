@@ -38,10 +38,8 @@
     <style name = "DrawerArrow" parent = "Base.Widget.AppCompat.DrawerArrowToggle">
 
         <item name ="color">@color/drawer_arrow_color</item>
-        <item name="middleBarArrowSize">16dp</item>
         <item name="spinBars">true</item>
         <item name="thickness">2dp</item>
-        <item name="topBottomBarArrowSize">15dp</item>
 
     </style>
 
